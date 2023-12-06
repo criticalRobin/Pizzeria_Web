@@ -1,6 +1,6 @@
 from django.shortcuts import render
-from .models import Product
-from .serializers import ProductSerializer
+from .models import Product, Table
+from .serializers import ProductSerializer, TableSerializer
 from rest_framework.generics import ListAPIView
 
 
@@ -8,3 +8,8 @@ from rest_framework.generics import ListAPIView
 class ProductList(ListAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+
+
+class TableList(ListAPIView):
+    queryset = Table.objects.all()
+    serializer_class = TableSerializer
