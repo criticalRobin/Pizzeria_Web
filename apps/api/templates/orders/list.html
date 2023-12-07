@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lista de Órdenes</title>
+  </head>
+  <body>
+    <h1>Órdenes Recientes</h1>
+    <div id="ordenes">
+      {% for order in orders %}
+        <div class="order-container">
+          <h2>Orden: {{ order.table }}</h2>
+          <p>Estado: {{ order.get_order_status_display }}</p>
+          <p>Empleado: {{ order.employee.username }}</p>
+          <ul>
+            {% for detail in order.orderdetails_set.all %}
+              <li>Producto: {{ detail.product.name }}, Cantidad: {{ detail.quantity }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endfor %}
+    </div>
+
+    <script type="text/javascript">
+      const ws = new WebSocket('ws://' + window.location.host + '/ws/orders/')
+      
+      ws.onmessage = function (e) {
+        const data = JSON.parse(e.data)
+        if (data.text && data.table && data.details) {
+          const ordersDiv = document.getElementById('ordenes')
+          const orderDiv = document.createElement('div')
+          orderDiv.innerHTML = `
+              <h2>Orden de Mesa: Mesa ${data.table}</h2>
+              ${data.text}
+              <ul>
+                ${data.details
+                  .map(
+                    (detail) => `
+                  <li>Producto: ${detail.product}, Cantidad: ${detail.quantity}</li>
+                `
+                  )
+                  .join('')}
+              </ul>
+            `
+          ordersDiv.appendChild(orderDiv)
+        }
+      }
+      
+      ws.onopen = function () {
+        console.log('WebSocket connection established')
+      }
+      
+      ws.onclose = function (event) {
+        console.error('WebSocket connection closed', event)
+      }
+      
+      ws.onerror = function (error) {
+        console.error('WebSocket error', error)
+      }
+    </script>
+  </body>
+</html>
