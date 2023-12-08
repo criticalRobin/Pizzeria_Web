@@ -1,27 +1,46 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Lista de Órdenes</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}" />
   </head>
   <body>
-    <h1>Órdenes Recientes</h1>
-    <div id="ordenes">
-      {% for order in orders %}
-        <div class="order-container">
-          <h2>Orden: {{ order.table }}</h2>
-          <p>Estado: {{ order.get_order_status_display }}</p>
-          <p>Empleado: {{ order.employee.username }}</p>
-          <ul>
-            {% for detail in order.orderdetails_set.all %}
-              <li>Producto: {{ detail.product.name }}, Cantidad: {{ detail.quantity }}</li>
-            {% endfor %}
-          </ul>
+    <nav class="navbar">
+      <div class="navbar-container">
+        <div class="navbar-welcome">
+          <h2>Bienvenido de vuelta, Matías</h2>
+          <p>Estos son los pedidos pendientes del día de hoy</p>
         </div>
-      {% endfor %}
+        <div class="navbar-logout">
+          <a href="#" class="logout-link">Log out</a>
+          <span class="logout-icon">🔒</span>
+        </div>
+      </div>
+    </nav>
+    <div class="orders-container">
+      <div class="orders-header">
+        <h3>📋 Pedidos Pendientes</h3>
+      </div>
+      <div id="ordenes">
+        {% for order in orders %}
+          <div class="order">
+            <h3>Orden: {{ order.table }}</h3>
+            <div class="order-details">
+              {% for detail in order.orderdetails_set.all %}
+                <div class="order-item">
+                  <div class="product-name">{{ detail.product.name }}</div>
+                  <div class="product-quantity">Cantidad: {{ detail.quantity }}</div>
+                  <button class="checkmark-button">✅</button>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
     </div>
-
     <script type="text/javascript">
       const ws = new WebSocket('ws://' + window.location.host + '/ws/orders/')
       
@@ -30,19 +49,25 @@
         if (data.text && data.table && data.details) {
           const ordersDiv = document.getElementById('ordenes')
           const orderDiv = document.createElement('div')
-          orderDiv.innerHTML = `
-              <h2>Orden de Mesa: Mesa ${data.table}</h2>
-              ${data.text}
-              <ul>
-                ${data.details
-                  .map(
-                    (detail) => `
-                  <li>Producto: ${detail.product}, Cantidad: ${detail.quantity}</li>
+          orderDiv.className = 'order'
+      
+          let orderDetailsHtml = data.details
+            .map(
+              (detail) => `
+                  <div class="order-item">
+                    <div class="product-name">${detail.product.name}</div>
+                    <div class="product-quantity">Cantidad: ${detail.quantity}</div>
+                    <button class="checkmark-button">✓</button>
+                  </div>
                 `
-                  )
-                  .join('')}
-              </ul>
-            `
+            )
+            .join('')
+      
+          orderDiv.innerHTML = `
+                  <h3>Orden: ${data.table}</h3>
+                  <div class="order-details">${orderDetailsHtml}</div>
+                `
+      
           ordersDiv.appendChild(orderDiv)
         }
       }
