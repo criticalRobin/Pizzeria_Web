@@ -5,9 +5,14 @@ from apps.main.models import Product
 
 
 class OrderDetailsSerializer(serializers.ModelSerializer):
+    product_name = serializers.SerializerMethodField()
+
     class Meta:
         model = OrderDetails
-        fields = ["product", "quantity"]
+        fields = ["product", "quantity", "product_name"]
+
+    def get_product_name(self, obj):
+        return obj.product.name
 
 
 class OrderSerializer(serializers.ModelSerializer):
