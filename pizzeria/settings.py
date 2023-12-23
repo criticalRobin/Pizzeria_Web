@@ -35,6 +35,7 @@ ALLOWED_HOSTS = ["*"]
 
 INSTALLED_APPS = [
     "channels",
+    "admin_argon.apps.AdminArgonConfig",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -43,6 +44,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     # my apps
+    "home",
     "apps.user",
     "apps.api",
     "apps.main",
@@ -77,7 +79,7 @@ ROOT_URLCONF = "pizzeria.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [os.path.join(BASE_DIR / "templates")],
+        "DIRS": [os.path.join(BASE_DIR / "home/templates")],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [

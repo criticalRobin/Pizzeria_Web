@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path, include  # new
 
 urlpatterns = [
+    path("", include("admin_argon.urls")),
     path("admin/", admin.site.urls),
     path("main/", include("apps.main.urls")),  # new
     path("api/", include("apps.api.urls")),  # new
