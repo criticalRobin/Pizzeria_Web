@@ -1,6 +1,7 @@
 from django.db import models
 from apps.user.models import User
 from apps.main.models import Product, Table
+from django.utils import timezone
 
 
 # Create your models here.
@@ -22,9 +23,14 @@ class Order(models.Model):
     employee = models.ForeignKey(
         User, on_delete=models.CASCADE, null=False, blank=False, verbose_name="Empleado"
     )
+    date = models.DateTimeField(default=timezone.now, verbose_name="Fecha")
 
     def __str__(self):
         return f"Orden de {self.table}"
+
+    class Meta:
+        verbose_name = "Orden"
+        verbose_name_plural = "Ordenes"
 
 
 class OrderDetails(models.Model):
@@ -47,3 +53,7 @@ class OrderDetails(models.Model):
 
     def __str__(self):
         return f"Detalle de {self.order}"
+
+    class Meta:
+        verbose_name = "Detalle de orden"
+        verbose_name_plural = "Detalles de orden"
