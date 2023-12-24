@@ -3,7 +3,7 @@
 <aside class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-4 " id="sidenav-main">
   <div class="sidenav-header">
     <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
-    <a class="navbar-brand m-0" href="/">
+    <a class="navbar-brand m-0" href="{% url 'admin:index' %}">
       <img src="{% static 'img/logo.jpg' %}" class="navbar-brand-img h-100" alt="main_logo">
       <span class="ms-1 font-weight-bold">La Cigarra Pizzeria</span>
     </a>
@@ -16,16 +16,6 @@
           {% for app in app_list %}
               {% if app.has_perms and not app.pinned %}
                 <li class="nav-item">
-                  {% comment %} <span class="nav-link{% if app_label != app.label and app.url not in request.path|urlencode  %} collapsed{% endif %} text-white" data-bs-toggle="collapse" data-bs-target="#submenu-{{ app.app_label }}">
-                    <span class="d-flex justify-content-between align-items-center">
-                      <div class="text-center me-2 d-flex align-items-center justify-content-center">
-                        <span class="sidebar-icon {{ app.icon }}"></span>
-                      </div>
-                      <a href="{{ app.url }}">
-                        <span class="nav-link-text ms-1">{{ app.label|slice:10 }}{% if app.label|length > 10 %}..{% endif %}</span>
-                      </a>
-                    </span>
-                  </span> {% endcomment %}
                     <a class="nav-link {% if app_label != app.label and app.url not in request.path|urlencode  %} collapsed{% endif %}" data-bs-toggle="collapse" data-bs-target="#submenu-{{ app.app_label }}" href="{{ app.url }}">
                       <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
                         <i class="{{ app.icon }} text-primary text-sm opacity-10"></i>
