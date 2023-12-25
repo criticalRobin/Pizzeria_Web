@@ -16,9 +16,16 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include  # new
+from fcm_django.api.rest_framework import FCMDeviceAuthorizedViewSet
+
+from rest_framework.routers import DefaultRouter
+router = DefaultRouter()
+
+router.register('devices', FCMDeviceAuthorizedViewSet)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("main/", include("apps.main.urls")),  # new
     path("api/", include("apps.api.urls")),  # new
+    path('', include(router.urls)),
 ]
