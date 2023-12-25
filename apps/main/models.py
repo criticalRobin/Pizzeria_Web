@@ -1,6 +1,7 @@
 import re
 from django.db import models
 from django.core.validators import MinLengthValidator, RegexValidator, EmailValidator
+from decimal import Decimal
 
 # Create your models here.
 dni_regex = r"^\d{10}$"
@@ -128,3 +129,9 @@ class Product(models.Model):
     class Meta:
         verbose_name = "Producto"
         verbose_name_plural = "Productos"
+
+    def save(self, *args, **kwargs):
+        self.sale_price = self.unit_price + (
+            self.unit_price * (Decimal(self.iva) * Decimal(0.01))
+        )
+        super().save(*args, **kwargs)

@@ -34,3 +34,7 @@ def dashboard_stats_view(request):
 
     # No renderizamos la plantilla aquí, solo devolvemos el contexto
     return context
+
+
+def index_view(request):
+    return render(request, "accounts/sign-in.html")

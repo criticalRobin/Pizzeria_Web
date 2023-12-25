@@ -20,7 +20,17 @@
                       <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
                         <i class="{{ app.icon }} text-primary text-sm opacity-10"></i>
                       </div>
-                      <span class="nav-link-text ms-1">{{ app.label|slice:10 }}{% if app.label|length > 10 %}..{% endif %}</span>
+                      <span class="nav-link-text ms-1">
+                        {% if app.app_label == 'api' %}
+                          Ordenes
+                        {% elif app.app_label == 'main' %}
+                          Principal
+                        {% elif app.app_label == 'user' %}
+                          Empleados
+                        {% else %}
+                          {{ app.label|slice:10 }}{% if app.label|length > 10 %}..{% endif %}
+                        {% endif %}
+                      </span>
                     </a>
 
                   {% if app.models %}
