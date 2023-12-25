@@ -81,7 +81,7 @@ INSTALLED_APPS = [
     "apps.user",
     "apps.api",
     "apps.main",
-    "fcm_django"
+    "fcm_django",
     "apps.authentication",
     "apps.payment",
 ]
