@@ -48,6 +48,8 @@ INSTALLED_APPS = [
     "apps.user",
     "apps.api",
     "apps.main",
+    "apps.authentication",
+    "apps.payment",
 ]
 
 ASGI_APPLICATION = "pizzeria.routing.application"
