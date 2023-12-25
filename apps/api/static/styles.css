@@ -17,8 +17,8 @@ body {
 
 .navbar-welcome h2 {
   margin: 0;
-  color: #333;
-  font-size: 24px;
+  color: #212529;
+  font-size: 18px;
 }
 
 .navbar-welcome p {
@@ -34,17 +34,13 @@ body {
 
 .logout-link {
   text-decoration: none;
-  color: #333;
-  font-size: 18px;
+  color: #212529;
+  font-size: 15px;
   margin-right: 10px;
 }
 
-.logout-icon {
-  font-size: 24px;
-}
-
 .orders-container {
-  background-color: #333;
+  background-color: #212529;
   border-radius: 10px;
   padding: 20px;
   color: white;

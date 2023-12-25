@@ -6,17 +6,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Lista de Órdenes</title>
     <link rel="stylesheet" href="{% static 'styles.css' %}" />
+    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
   </head>
   <body>
     <nav class="navbar">
       <div class="navbar-container">
         <div class="navbar-welcome">
-          <h2>Bienvenido de vuelta, Matías</h2>
+          <h3>Bienvenido de vuelta, {{ user.first_name }}</h3>
           <p>Estos son los pedidos pendientes del día de hoy</p>
         </div>
         <div class="navbar-logout">
-          <a href="#" class="logout-link">Log out</a>
-          <span class="logout-icon">🔒</span>
+          <a href="{% url 'auth:logout' %}" class="logout-link">
+            <i class="fa fa-user me-sm-1"></i>
+            <span class="d-sm-inline d-none me-3">Salir</span>
+          </a>
         </div>
       </div>
     </nav>

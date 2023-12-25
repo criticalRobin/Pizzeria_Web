@@ -1,6 +1,7 @@
 import re
 from django.db import models
 from django.core.validators import MinLengthValidator, RegexValidator, EmailValidator
+from decimal import Decimal
 
 # Create your models here.
 dni_regex = r"^\d{10}$"
@@ -80,6 +81,10 @@ class Client(models.Model):
     def __str__(self):
         return self.name + " " + self.surname
 
+    class Meta:
+        verbose_name = "Cliente"
+        verbose_name_plural = "Clientes"
+
 
 class Table(models.Model):
     chairs_number = models.IntegerField(default=1, verbose_name="Número de sillas")
@@ -87,6 +92,10 @@ class Table(models.Model):
 
     def __str__(self):
         return "Mesa " + str(self.id)
+
+    class Meta:
+        verbose_name = "Mesa"
+        verbose_name_plural = "Mesas"
 
 
 class Product(models.Model):
@@ -116,3 +125,13 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        verbose_name = "Producto"
+        verbose_name_plural = "Productos"
+
+    def save(self, *args, **kwargs):
+        self.sale_price = self.unit_price + (
+            self.unit_price * (Decimal(self.iva) * Decimal(0.01))
+        )
+        super().save(*args, **kwargs)

@@ -7,10 +7,12 @@ from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from fcm_django.models import FCMDevice
 from firebase_admin.messaging import Message, Notification
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+
 # Create your views here.
-
-
-class OrderListView(ListView):
+class OrderListView(LoginRequiredMixin, ListView):
+    login_url = "auth:login"
     model = Order
     template_name = "orders/list.html"
 
