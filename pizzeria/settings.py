@@ -13,6 +13,38 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 from pathlib import Path
 import mimetypes
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import initialize_app
+from google.auth import load_credentials_from_file
+from google.oauth2.service_account import Credentials
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=180),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=50),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "UPDATE_LAST_LOGIN": False,
+    "ALGORITHM": "HS256",
+    "VERIFYING_KEY": None,
+    "AUDIENCE": None,
+    "ISSUER": None,
+    "JWK_URL": None,
+    "LEEWAY": 0,
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
+    "USER_ID_FIELD": "id",
+    "USER_ID_CLAIM": "user_id",
+    "USER_AUTHENTICATION_RULE": "rest_framework_simplejwt.authentication.default_user_authentication_rule",
+    "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
+    "TOKEN_TYPE_CLAIM": "token_type",
+    "TOKEN_USER_CLASS": "rest_framework_simplejwt.models.TokenUser",
+    "JTI_CLAIM": "jti",
+    "SLIDING_TOKEN_REFRESH_EXP_CLAIM": "refresh_exp",
+    "SLIDING_TOKEN_LIFETIME": timedelta(minutes=5),
+    "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
+}
 
 mimetypes.add_type("text/css", ".css", True)
 
@@ -43,14 +75,22 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "rest_framework_simplejwt.token_blacklist",
     # my apps
     "home",
     "apps.user",
     "apps.api",
     "apps.main",
+    "fcm_django",
     "apps.authentication",
     "apps.payment",
 ]
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    )
+}
 
 ASGI_APPLICATION = "pizzeria.routing.application"
 
@@ -157,3 +197,33 @@ STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static_cdn", "static_root
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "user.User"
+
+# Obtén la ruta absoluta del archivo JSON de credenciales de Firebase
+# Suponiendo que 'proyectovisuales-eb549-firebase-adminsdk-7c52q-1f6698e95e.json'
+# esté en el mismo directorio que tu settings.py
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+cred_file = BASE_DIR / 'pizzeria' / 'proyectovisuales-eb549-firebase-adminsdk-7c52q-1f6698e95e.json'
+
+# Verifica que el archivo de credenciales exista
+if not cred_file.is_file():
+    raise FileNotFoundError(f"No se encontró el archivo de credenciales de Firebase en {cred_file}")
+
+# Inicializa las credenciales y la aplicación Firebase
+cred = credentials.Certificate(cred_file)
+firebase_app = initialize_app(cred)
+FCM_DJANGO_SETTINGS = {
+     # an instance of firebase_admin.App to be used as default for all fcm-django requests
+     # default: None (the default Firebase app)
+    "DEFAULT_FIREBASE_APP": firebase_app,
+     # default: _('FCM Django')
+    "APP_VERBOSE_NAME": "Telefonos conectados",
+     # true if you want to have only one active device per registered user at a time
+     # default: False
+    "ONE_DEVICE_PER_USER": False,
+     # devices to which notifications cannot be sent,
+     # are deleted upon receiving error response from FCM
+     # default: False
+    "DELETE_INACTIVE_DEVICES": False,
+    
+}

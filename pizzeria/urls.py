@@ -16,13 +16,28 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include  # new
+from fcm_django.api.rest_framework import FCMDeviceAuthorizedViewSet
+
+from rest_framework.routers import DefaultRouter
+router = DefaultRouter()
+
+router.register('devices', FCMDeviceAuthorizedViewSet)
 from home.admin import home_admin_site
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+    TokenVerifyView,
+)
 
 urlpatterns = [
     path("", include("apps.authentication.urls")),  # new
+    path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path("api/token/verify/", TokenVerifyView.as_view(), name="token_verify"),
     path("user/", include("apps.user.urls")),  # new
     path("admin/", home_admin_site.urls),
     path("main/", include("apps.main.urls")),  # new
     path("api/", include("apps.api.urls")),  # new
+    path('route/', include(router.urls)),
     path("payment/", include("apps.payment.urls")),  # new
 ]
