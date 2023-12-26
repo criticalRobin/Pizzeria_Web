@@ -16,8 +16,8 @@ def update_order_status(sender, instance, **kwargs):
     order = instance.order
     total_details = order.orderdetails_set.count()
     delivered_details = order.orderdetails_set.filter(detail_status="E").count()
-
-    if total_details == delivered_details:
+    ready_details = order.orderdetails_set.filter(detail_status="L").count()
+    if total_details == delivered_details + ready_details:
         order.order_status = "E"
     elif delivered_details > 0:
         order.order_status = "P"

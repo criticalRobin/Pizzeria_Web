@@ -52,6 +52,7 @@ class OrderDetails(models.Model):
     )
     STATUS_CHOICES = [
         ("P", "Pendiente"),
+        ("L", "Listo"),
         ("E", "Entregado"),
     ]
     detail_status = models.CharField(

@@ -62,18 +62,25 @@ class OrderDetailUpdateView(UpdateView):
         form = self.form_class(request.POST, instance=self.get_object())
 
         if form.is_valid():
-            form.save()
-            # Obtener todos los dispositivos registrados y enviar el mensaje
-            devices = FCMDevice.objects.filter(active=True)
-            devices.send_message(
-                message=Message(
-                    notification=Notification(
-                        title="Plato listo", body=f"prueba de notificacion"
+            order_detail = form.save(commit=False)
+
+            # Comprobar si detail_status es 'L'
+            if order_detail.detail_status == 'L':
+                # Enviar notificación
+                devices = FCMDevice.objects.filter(active=True)
+                devices.send_message(
+                    message=Message(
+                        notification=Notification(
+                            title="Plato listo", 
+                            body=f"El plato {order_detail.product} está listo"
+                        ),
                     ),
-                ),
-                # this is optional
-                # app=settings.FCM_DJANGO_SETTINGS['DEFAULT_FIREBASE_APP']
-            )
+                    # Opcional
+                    # app=settings.FCM_DJANGO_SETTINGS['DEFAULT_FIREBASE_APP']
+                )
+
+            # Guardar el objeto después de comprobar el estado
+            order_detail.save()
             return HttpResponseRedirect(self.success_url)
         self.object = None
         context = self.get_context_data(**kwargs)
