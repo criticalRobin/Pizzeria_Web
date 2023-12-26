@@ -9,7 +9,7 @@ class OrderDetailsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OrderDetails
-        fields = ["product", "quantity", "product_name"]
+        fields = ["id", "product", "quantity", "product_name","detail_status"]
 
     def get_product_name(self, obj):
         return obj.product.name

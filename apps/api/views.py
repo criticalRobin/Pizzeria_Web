@@ -1,8 +1,11 @@
 from django.shortcuts import render
-from .models import Order
+from django.http import HttpResponseRedirect
+from django.urls import reverse_lazy
+from .models import Order, OrderDetails
 from .serializers import OrderSerializer, OrderDetailsSerializer
 from rest_framework.generics import ListCreateAPIView
-from django.views.generic import ListView
+from django.views.generic import ListView, UpdateView
+from .forms import UpdateOrderDetailsForm
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from fcm_django.models import FCMDevice
@@ -28,19 +31,7 @@ class OrderListCreateView(ListCreateAPIView):
 
     def perform_create(self, serializer):
         order = serializer.save()
-        # Obtener todos los dispositivos registrados y enviar el mensaje
-        devices = FCMDevice.objects.filter(active=True)
-        devices.send_message(
-                message =Message(
-                    notification=Notification(
-                        title='Nueva orden',
-                        body=f'prueba de notificacion'
-                    ),
-                ),
-                # this is optional
-                # app=settings.FCM_DJANGO_SETTINGS['DEFAULT_FIREBASE_APP']
-        )
-        
+
         channel_layer = get_channel_layer()
 
         # Serializar la información de la orden, incluyendo los detalles
@@ -59,3 +50,39 @@ class OrderListCreateView(ListCreateAPIView):
         async_to_sync(channel_layer.group_send)(
             "orders", {"type": "order.update", "message": order_data}
         )
+
+
+class OrderDetailUpdateView(UpdateView):
+    model = OrderDetails
+    template_name = "orders/update.html"
+    form_class = UpdateOrderDetailsForm
+    success_url = reverse_lazy("api:orders_list")
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST, instance=self.get_object())
+
+        if form.is_valid():
+            order_detail = form.save(commit=False)
+
+            # Comprobar si detail_status es 'L'
+            if order_detail.detail_status == 'L':
+                # Enviar notificación
+                devices = FCMDevice.objects.filter(active=True)
+                devices.send_message(
+                    message=Message(
+                        notification=Notification(
+                            title="Plato listo", 
+                            body=f"El plato {order_detail.product} está listo"
+                        ),
+                    ),
+                    # Opcional
+                    # app=settings.FCM_DJANGO_SETTINGS['DEFAULT_FIREBASE_APP']
+                )
+
+            # Guardar el objeto después de comprobar el estado
+            order_detail.save()
+            return HttpResponseRedirect(self.success_url)
+        self.object = None
+        context = self.get_context_data(**kwargs)
+        context["form"] = form
+        return render(request, self.template_name, context)

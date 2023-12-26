@@ -50,6 +50,17 @@ class OrderDetails(models.Model):
     total = models.DecimalField(
         default=0.00, max_digits=9, decimal_places=2, verbose_name="Total"
     )
+    STATUS_CHOICES = [
+        ("P", "Pendiente"),
+        ("L", "Listo"),
+        ("E", "Entregado"),
+    ]
+    detail_status = models.CharField(
+        choices=STATUS_CHOICES,
+        default="P",
+        max_length=1,
+        verbose_name="Estado de la orden",
+    )
 
     def __str__(self):
         return f"Detalle de {self.order}"

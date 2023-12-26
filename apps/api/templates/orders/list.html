@@ -29,18 +29,22 @@
       </div>
       <div id="ordenes">
         {% for order in orders %}
-          <div class="order">
-            <h3>Orden: {{ order.table }}</h3>
-            <div class="order-details">
-              {% for detail in order.orderdetails_set.all %}
+        {% if order.order_status == "P" %}
+        <div class="order">
+          <h3>Orden: {{ order.table }}</h3>
+          <div class="order-details">
+            {% for detail in order.orderdetails_set.all %}
+              {% if detail.detail_status == 'P' %}
                 <div class="order-item">
                   <div class="product-name">{{ detail.product.name }}</div>
                   <div class="product-quantity">Cantidad: {{ detail.quantity }}</div>
-                  <button class="checkmark-button">✅</button>
+                  <a href="{% url 'api:orders_update' detail.pk %}"><button class="checkmark-button">✅</button></a>
                 </div>
-              {% endfor %}
-            </div>
+              {% endif %}
+            {% endfor %}
           </div>
+        </div>
+        {% endif %}
         {% endfor %}
       </div>
     </div>
@@ -57,19 +61,19 @@
           let orderDetailsHtml = data.details
             .map(
               (detail) => `
-                  <div class="order-item">
-                    <div class="product-name">${detail.product_name}</div>
-                    <div class="product-quantity">Cantidad: ${detail.quantity}</div>
-                    <button class="checkmark-button">✓</button>
-                  </div>
-                `
+                              <div class="order-item">
+                                <div class="product-name">${detail.product_name}</div>
+                                <div class="product-quantity">Cantidad: ${detail.quantity}</div>
+                                <a href="/api/orders/update/${detail.id}"><button class="checkmark-button">✅</button></a>
+                              </div>
+                            `
             )
             .join('')
       
           orderDiv.innerHTML = `
-                  <h3>Orden: ${data.table}</h3>
-                  <div class="order-details">${orderDetailsHtml}</div>
-                `
+                              <h3>Orden: ${data.table}</h3>
+                              <div class="order-details">${orderDetailsHtml}</div>
+                            `
       
           ordersDiv.appendChild(orderDiv)
         }
