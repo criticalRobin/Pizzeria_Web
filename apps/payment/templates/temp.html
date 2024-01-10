@@ -24,7 +24,16 @@
       </div>
     </nav>
     <div>
-        <h1>EN CONSTRUCCIÓN...</h1>
+      <ul>
+        {% for order in orders %}
+          <div>
+            <a href="{% url 'payment:create_order_payment' order.id %}">
+              <li>{{ order.table }}</li>
+              <li>{{ order.total }}</li>
+            </a>
+          </div>
+        {% endfor %}
+      </ul>
     </div>
   </body>
 </html>

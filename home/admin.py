@@ -5,6 +5,7 @@ from .views import dashboard_stats_view
 from apps.api.models import *
 from apps.user.models import *
 from apps.main.models import *
+from apps.payment.models import *
 from fcm_django.models import FCMDevice
 
 
@@ -26,4 +27,5 @@ home_admin_site.register(Product)
 home_admin_site.register(Table)
 home_admin_site.register(Client)
 home_admin_site.register(FCMDevice)
+home_admin_site.register(Payment)
 
