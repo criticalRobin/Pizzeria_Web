@@ -15,10 +15,11 @@ body {
   align-items: center;
 }
 
-.navbar-welcome h2 {
+.navbar-welcome h3 {
   margin: 0;
   color: #212529;
   font-size: 18px;
+  font-weight: bold;
 }
 
 .navbar-welcome p {
@@ -55,6 +56,12 @@ body {
   display: flex;
   flex-direction: column;
   align-items: start;
+}
+
+.orders-header h3{
+  color: #fff;
+  font-weight: bold;
+  font-size: 14;
 }
 
 .order {

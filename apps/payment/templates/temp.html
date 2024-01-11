@@ -5,15 +5,181 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Lista de Órdenes</title>
-    <link rel="stylesheet" href="{% static 'styles.css' %}" />
     <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+      }
+      
+      .navbar {
+        background-color: #f8f8f8;
+        border-bottom: 1px solid #e7e7e7;
+        padding: 10px 20px;
+      }
+      
+      .navbar-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      
+      .navbar-welcome h3 {
+        margin: 0;
+        color: #212529;
+        font-size: 18px;
+        font-weight: bold;
+      }
+      
+      .navbar-welcome p {
+        margin: 0;
+        color: #666;
+        font-size: 14px;
+      }
+      
+      .navbar-logout {
+        display: flex;
+        align-items: center;
+      }
+      
+      .logout-link {
+        text-decoration: none;
+        color: #212529;
+        font-size: 15px;
+        margin-right: 10px;
+      }
+      
+      .orders-container {
+        background-color: #212529;
+        border-radius: 10px;
+        padding: 20px;
+        color: white;
+        width: 50%;
+        margin: auto;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+        margin-top: 25px;
+        margin-bottom: 50px;
+      }
+      
+      .orders-header {
+        display: flex;
+        flex-direction: column;
+        align-items: start;
+      }
+      
+      .orders-header h3 {
+        color: #fff;
+        font-weight: bold;
+        font-size: 14;
+      }
+      
+      .order {
+        background-color: #444;
+        border-radius: 8px;
+        padding: 10px;
+        margin-bottom: 10px;
+      }
+      
+      .order-details {
+        margin-top: 10px;
+      }
+      
+      .order-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+      
+      .product-name {
+        flex-grow: 1;
+        margin-right: 10px;
+      }
+      
+      .product-quantity {
+        flex-basis: 100px;
+        margin-right: 180px;
+      }
+      
+      .checkmark-button {
+        background-color: #4caf50;
+        border: none;
+        color: white;
+        padding: 5px 10px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        cursor: pointer;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        transition: background-color 0.3s ease;
+        margin-left: 10px;
+      }
+      
+      .checkmark-button:hover {
+        background-color: #45a049;
+      }
+      
+      /* Responsive Styles */
+      @media (max-width: 768px) {
+        .navbar-container {
+          flex-direction: column;
+        }
+      
+        .orders-container {
+          width: 80%;
+          margin-top: 10px;
+          margin-bottom: 25px;
+        }
+      
+        .order-item {
+          justify-content: space-between;
+        }
+      
+        .product-quantity {
+          flex-basis: auto;
+          margin-right: 10px;
+        }
+      
+        .checkmark-button {
+          margin-left: auto;
+        }
+      }
+      
+      @media (max-width: 576px) {
+        .orders-container {
+          width: 90%;
+          padding: 10px;
+        }
+      
+        .order-item {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+      
+        .product-name,
+        .product-quantity {
+          margin-right: 0;
+        }
+      
+        .checkmark-button {
+          padding: 10px 20px;
+          margin-top: 10px;
+          width: 100%;
+          box-sizing: border-box;
+        }
+      }
+    </style>
   </head>
   <body>
     <nav class="navbar">
       <div class="navbar-container">
         <div class="navbar-welcome">
           <h3>Bienvenido de vuelta, {{ user.first_name }}</h3>
-          <p>Estos son los pagos pendientes del día de hoy</p>
+          <p>Estos son los pedidos pendientes del día de hoy</p>
         </div>
         <div class="navbar-logout">
           <a href="{% url 'auth:logout' %}" class="logout-link">
@@ -23,17 +189,74 @@
         </div>
       </div>
     </nav>
-    <div>
-      <ul>
+
+    <div class="orders-container">
+      <div class="orders-header">
+        <h5 style="font-weight: bold;">📋 Pedidos Por Cobrar</h5>
+      </div>
+      <div id="ordenes">
         {% for order in orders %}
-          <div>
-            <a href="{% url 'payment:create_order_payment' order.id %}">
-              <li>{{ order.table }}</li>
-              <li>{{ order.total }}</li>
-            </a>
+          <!-- Modal -->
+          <div class="modal fade" id="modal{{ order.id }}" tabindex="-1" aria-labelledby="modalLabel{{ order.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <!-- Cabecera del modal -->
+                <div class="modal-header">
+                  <h5 class="modal-title text-dark" id="modalLabel{{ order.id }}">Detalles Pedido: {{ order.id }} - {{ order.table }}</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <!-- Cuerpo del modal -->
+                <div class="modal-body">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th scope="col">Producto</th>
+                        <th scope="col">Cantidad</th>
+                        <th scope="col">Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for det in order_details %}
+                        {% if det.order_id == order.id %}
+                          <tr>
+                            <td>{{ det.product.name }}</td>
+                            <td>{{ det.quantity }}</td>
+                            <td>${{ det.total }}</td>
+                          </tr>
+                        {% endif %}
+                      {% endfor %}
+                      <tr>
+                        <td>
+                          <strong>Total a Pagar:</strong>
+                        </td> <!-- Mover el Total a Pagar aquí -->
+                        <td></td> <!-- Celda vacía para la columna de Cantidad -->
+                        <td>
+                          <strong>${{ order.total }}</strong>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- Pie de página del modal -->
+                <div class="modal-footer">
+                  <a href={% url 'payment:create_order_payment' order.id %}><button type="button" class="btn bg-dark text-white" data-bs-dismiss="modal">Tarjeta <i class="fas fa-credit-card"></i></button></a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="order">
+            <h5 style="font-weight: bold;">Orden: {{ order.table }}</h5>
+            <div class="order-details">
+              <div class="order-item">
+                <div class="product-name">Total a Pagar: ${{ order.total }}</div>
+                <a href="#" data-bs-toggle="modal" data-bs-target="#modal{{ order.id }}" class="text-dark text-decoration-none"><button class="checkmark-button"><i class="fas fa-hourglass-start"></i></button></a>
+              </div>
+            </div>
           </div>
         {% endfor %}
-      </ul>
+      </div>
     </div>
   </body>
 </html>
