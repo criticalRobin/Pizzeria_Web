@@ -7,7 +7,9 @@ from django.utils import timezone
 # Create your models here.
 class Payment(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, verbose_name="Orden")
-    client = models.ForeignKey(Client, on_delete=models.CASCADE, verbose_name="Cliente")
+    client = models.ForeignKey(
+        Client, on_delete=models.CASCADE, verbose_name="Cliente", null=True, blank=True
+    )
     PAYMENT_CHOICES = (
         ("E", "Efectivo"),
         ("T", "Tarjeta"),

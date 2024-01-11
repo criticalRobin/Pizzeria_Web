@@ -38,9 +38,7 @@ def create_order_payment(request, order_id):
                 "product_data": {
                     "name": detail.product.name,
                 },
-                "unit_amount": int(
-                    detail.product.sale_price * 100
-                ), 
+                "unit_amount": int(detail.product.sale_price * 100),
             },
             "quantity": detail.quantity,
         }
@@ -62,7 +60,7 @@ def create_order_payment(request, order_id):
 
     Payment.objects.create(
         order=order,
-        client=Client.objects.get(id=1),
+        client=None,
         amount=order.total,
         stripe_transaction_id=checkout_session["id"],
         status="P",
@@ -76,16 +74,43 @@ def create_order_payment(request, order_id):
 def payment_success(request, order_id):
     order = Order.objects.get(id=order_id)
     payment = Payment.objects.get(order=order)
+    table = order.table
+    session_id = request.GET.get("session_id")
+    stripe.api_key = settings.STRIPE_API_KEY_HIDDEN
 
-    # Actualizar el registro de pago
-    payment.status = "C"  # Completado
+    if session_id:
+        session = stripe.checkout.Session.retrieve(session_id)
+        customer_email = session.get("customer_details", {}).get("email", None)
+        name = session.get("customer_details", {}).get("name", None)
+
+        if name is not None:
+            complete_name = name.split(" ")
+            first_name = complete_name[0]
+            last_name = complete_name[1]
+
+    payment.status = "C"
+    client_check = Client.objects.filter(email=customer_email).exists()
+
+    if not client_check:
+        payment.client = Client.objects.create(
+            dni=None,
+            name=first_name,
+            surname=last_name,
+            address=None,
+            phone_number=None,
+            email=customer_email,
+        )
+    else:
+        payment.client = Client.objects.get(email=customer_email)
     payment.save()
 
-    # Actualizar el estado de la orden
-    order.order_status = "C"  # Cancelado
+    order.order_status = "C"
     order.save()
 
-    # Redirigir al usuario a la página de éxito
+    if table.available is False:
+        table.available = True
+        table.save()
+
     return render(request, "success.html", {"order": order})
 
 

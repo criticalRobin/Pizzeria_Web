@@ -20,8 +20,8 @@ class Client(models.Model):
         max_length=10,
         validators=[MinLengthValidator(10), ecuadorian_dni_validator],
         unique=True,
-        null=False,
-        blank=False,
+        null=True,
+        blank=True,
         verbose_name="Cédula",
     )
     name = models.CharField(
@@ -43,8 +43,8 @@ class Client(models.Model):
         validators=[
             RegexValidator(r"^[A-Za-z0-9\s]+$", "No se permiten caracteres especiales")
         ],
-        null=False,
-        blank=False,
+        null=True,
+        blank=True,
         verbose_name="Dirección",
     )
 
@@ -58,6 +58,8 @@ class Client(models.Model):
         max_length=10,
         unique=True,
         validators=[MinLengthValidator(10), phone_validator],
+        null=True,
+        blank=True,
         verbose_name="Teléfono",
     )
     email = models.CharField(
