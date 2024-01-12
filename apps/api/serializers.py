@@ -9,7 +9,7 @@ class OrderDetailsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OrderDetails
-        fields = ["id", "product", "quantity", "product_name","detail_status"]
+        fields = ["id", "product", "quantity", "product_name", "detail_status"]
 
     def get_product_name(self, obj):
         return obj.product.name
@@ -27,13 +27,19 @@ class OrderSerializer(serializers.ModelSerializer):
         
         validated_data["employee"] = User.objects.get(pk=5)
         order = Order.objects.create(**validated_data)
+        total_order = 0
 
         for detail_data in orderdetails_data:
             product = detail_data.pop("product")
             quantity = detail_data.pop("quantity")
             total = product.sale_price * quantity
+            total_order += total
+
             OrderDetails.objects.create(
                 order=order, product=product, quantity=quantity, total=total
             )
+
+        order.total = total_order
+        order.save()
 
         return order

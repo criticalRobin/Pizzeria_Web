@@ -57,6 +57,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = "django-insecure-jjudb-&z4%axqx3v5(4#n$8hx_6cb4r7q%*6)4#@9@)e0zw7j8"
+STRIPE_API_KEY_PUBLISHABLE = "pk_test_51OWWyHHYxdKboImTe0B7Z3egtHbvuGo1OYHZThgIJN0ysZlv6YRq1kGg50GLvT3p6FUfBNJ73CN40HddrG400QuV00sKOneSWp"
+STRIPE_API_KEY_HIDDEN = "sk_test_51OWWyHHYxdKboImTB6DiBOIuwIo8BUcDXmRk9jLBEBTmBEFBoYuDXKzNozRY09T8e49p3lgfAIyanlnLw9c4Q3De00rIjlF9w2"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -203,27 +205,32 @@ AUTH_USER_MODEL = "user.User"
 # esté en el mismo directorio que tu settings.py
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-cred_file = BASE_DIR / 'pizzeria' / 'proyectovisuales-eb549-firebase-adminsdk-7c52q-1f6698e95e.json'
+cred_file = (
+    BASE_DIR
+    / "pizzeria"
+    / "proyectovisuales-eb549-firebase-adminsdk-7c52q-1f6698e95e.json"
+)
 
 # Verifica que el archivo de credenciales exista
 if not cred_file.is_file():
-    raise FileNotFoundError(f"No se encontró el archivo de credenciales de Firebase en {cred_file}")
+    raise FileNotFoundError(
+        f"No se encontró el archivo de credenciales de Firebase en {cred_file}"
+    )
 
 # Inicializa las credenciales y la aplicación Firebase
 cred = credentials.Certificate(cred_file)
 firebase_app = initialize_app(cred)
 FCM_DJANGO_SETTINGS = {
-     # an instance of firebase_admin.App to be used as default for all fcm-django requests
-     # default: None (the default Firebase app)
+    # an instance of firebase_admin.App to be used as default for all fcm-django requests
+    # default: None (the default Firebase app)
     "DEFAULT_FIREBASE_APP": firebase_app,
-     # default: _('FCM Django')
+    # default: _('FCM Django')
     "APP_VERBOSE_NAME": "Telefonos conectados",
-     # true if you want to have only one active device per registered user at a time
-     # default: False
+    # true if you want to have only one active device per registered user at a time
+    # default: False
     "ONE_DEVICE_PER_USER": False,
-     # devices to which notifications cannot be sent,
-     # are deleted upon receiving error response from FCM
-     # default: False
+    # devices to which notifications cannot be sent,
+    # are deleted upon receiving error response from FCM
+    # default: False
     "DELETE_INACTIVE_DEVICES": False,
-    
 }

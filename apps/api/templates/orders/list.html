@@ -38,7 +38,7 @@
                 <div class="order-item">
                   <div class="product-name">{{ detail.product.name }}</div>
                   <div class="product-quantity">Cantidad: {{ detail.quantity }}</div>
-                  <a href="{% url 'api:orders_update' detail.pk %}"><button class="checkmark-button">✅</button></a>
+                  <a href="{% url 'api:orders_update' detail.pk %}"><button class="checkmark-button"><i class="fas fa-check"></i></button></a>
                 </div>
               {% endif %}
             {% endfor %}
@@ -64,7 +64,7 @@
                               <div class="order-item">
                                 <div class="product-name">${detail.product_name}</div>
                                 <div class="product-quantity">Cantidad: ${detail.quantity}</div>
-                                <a href="/api/orders/update/${detail.id}"><button class="checkmark-button">✅</button></a>
+                                <a href="/api/orders/update/${detail.id}"><button class="checkmark-button"><i class="fas fa-check"></i></button></a>
                               </div>
                             `
             )
