@@ -100,9 +100,30 @@ class Table(models.Model):
         verbose_name_plural = "Mesas"
 
 
+class Category(models.Model):
+    name = models.CharField(
+        max_length=20, null=False, blank=False, verbose_name="Nombre"
+    )
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Categoría"
+        verbose_name_plural = "Categorías"
+
+
 class Product(models.Model):
     name = models.CharField(
         max_length=20, null=False, blank=False, verbose_name="Nombre"
+    )
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.CASCADE,
+        verbose_name="Categoría",
+        null=True,
+        blank=True,
+        default=None,
     )
     stock = models.PositiveIntegerField(
         default=0, null=True, blank=True, verbose_name="Stock"
