@@ -24,7 +24,8 @@ class OrderSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         orderdetails_data = validated_data.pop("orderdetails_set", [])
-        validated_data["employee"] = User.objects.get(pk=2)
+        
+        validated_data["employee"] = User.objects.get(pk=5)
         order = Order.objects.create(**validated_data)
 
         for detail_data in orderdetails_data:
