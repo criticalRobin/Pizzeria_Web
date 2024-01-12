@@ -4,6 +4,7 @@ from .views import (
     create_order_payment,
     payment_success,
     payment_cancelled,
+    PaymentCreateView,
 )
 
 app_name = "payment"
@@ -25,4 +26,5 @@ urlpatterns = [
         payment_cancelled,
         name="payment_cancelled",
     ),
+    path("create/<int:pk>/", PaymentCreateView.as_view(), name="money_payment"),
 ]

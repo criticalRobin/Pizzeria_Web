@@ -1,10 +1,12 @@
-from django.shortcuts import render, redirect
-from django.urls import reverse
+from django.shortcuts import get_object_or_404, render, redirect
+from django.http import HttpResponseRedirect
+from django.urls import reverse, reverse_lazy
 from django.contrib.auth.decorators import login_required
-from django.views.generic import ListView
+from django.views.generic import ListView, CreateView
 from apps.api.models import Order, OrderDetails
 from apps.main.models import Client
 from .models import Payment
+from .forms import CreatePaymentForm
 from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.conf import settings
@@ -23,6 +25,64 @@ class OrdersToPayListView(LoginRequiredMixin, ListView):
         context["orders"] = orders_to_pay
         context["order_details"] = orders_to_pay_details
         return context
+
+
+class PaymentCreateView(LoginRequiredMixin, CreateView):
+    model = Payment
+    form_class = CreatePaymentForm
+    template_name = "create.html"
+    success_url = reverse_lazy("payment:temp")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        order_id = self.kwargs.get("pk")
+        if order_id:
+            order = get_object_or_404(Order, id=order_id)
+            orders_to_pay_details = OrderDetails.objects.filter(order=order)
+            clients = Client.objects.all()
+            context["order"] = order
+            context["order_details"] = orders_to_pay_details
+            context["clients"] = clients
+        return context
+    
+    def get(self, request, *args, **kwargs):
+        self.request.session['current_order_id'] = kwargs['pk']
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        order_id = kwargs["pk"]
+        order = get_object_or_404(Order, id=order_id)
+        form = self.form_class(request.POST)
+
+        if form.is_valid():
+            payment = form.save(commit=False)
+            client_id = request.POST.get(
+                "client_id"
+            ) 
+            if client_id:
+                payment.client = Client.objects.get(
+                    id=client_id
+                ) 
+            payment.order = order
+            payment.payment_method = "E"
+            payment.amount = order.total
+            payment.status = "C"
+            payment.payment_date = timezone.now()
+
+            order.order_status = "C"
+            order.save()
+
+            table = order.table
+            if not table.available:
+                table.available = True
+                table.save()
+
+            payment.save()
+            return HttpResponseRedirect(self.success_url)
+
+        context = self.get_context_data(**kwargs)
+        context["form"] = form
+        return render(request, self.template_name, context)
 
 
 @login_required
