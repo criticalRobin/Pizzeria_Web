@@ -10,10 +10,7 @@ class Order(models.Model):
         Table, on_delete=models.CASCADE, null=False, blank=False, verbose_name="Mesa"
     )
 
-    STATUS_CHOICES = [
-        ("P", "Pendiente"),
-        ("E", "Entregado"),
-    ]
+    STATUS_CHOICES = [("P", "Pendiente"), ("E", "Entregado"), ("C", "Cancelado")]
     order_status = models.CharField(
         choices=STATUS_CHOICES,
         default="P",
@@ -24,6 +21,9 @@ class Order(models.Model):
         User, on_delete=models.CASCADE, null=False, blank=False, verbose_name="Empleado"
     )
     date = models.DateTimeField(default=timezone.now, verbose_name="Fecha")
+    total = total = models.DecimalField(
+        default=0.00, max_digits=9, decimal_places=2, verbose_name="Total de la Orden"
+    )
 
     def __str__(self):
         return f"Orden de {self.table}"

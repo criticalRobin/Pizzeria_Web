@@ -20,8 +20,8 @@ class Client(models.Model):
         max_length=10,
         validators=[MinLengthValidator(10), ecuadorian_dni_validator],
         unique=True,
-        null=False,
-        blank=False,
+        null=True,
+        blank=True,
         verbose_name="Cédula",
     )
     name = models.CharField(
@@ -43,8 +43,8 @@ class Client(models.Model):
         validators=[
             RegexValidator(r"^[A-Za-z0-9\s]+$", "No se permiten caracteres especiales")
         ],
-        null=False,
-        blank=False,
+        null=True,
+        blank=True,
         verbose_name="Dirección",
     )
 
@@ -58,6 +58,8 @@ class Client(models.Model):
         max_length=10,
         unique=True,
         validators=[MinLengthValidator(10), phone_validator],
+        null=True,
+        blank=True,
         verbose_name="Teléfono",
     )
     email = models.CharField(
@@ -98,9 +100,30 @@ class Table(models.Model):
         verbose_name_plural = "Mesas"
 
 
+class Category(models.Model):
+    name = models.CharField(
+        max_length=20, null=False, blank=False, verbose_name="Nombre"
+    )
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Categoría"
+        verbose_name_plural = "Categorías"
+
+
 class Product(models.Model):
     name = models.CharField(
         max_length=20, null=False, blank=False, verbose_name="Nombre"
+    )
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.CASCADE,
+        verbose_name="Categoría",
+        null=True,
+        blank=True,
+        default=None,
     )
     stock = models.PositiveIntegerField(
         default=0, null=True, blank=True, verbose_name="Stock"

@@ -4,10 +4,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lista de Órdenes</title>
+    <title>Pago Efectivo</title>
     <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css" />
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
     <style>
       body {
         margin: 0;
@@ -189,75 +192,95 @@
         </div>
       </div>
     </nav>
-
-    <div class="orders-container">
-      <div class="orders-header">
-        <h5 style="font-weight: bold;">📋 Pedidos Por Cobrar</h5>
-      </div>
-      <div id="ordenes">
-        {% for order in orders %}
-          <!-- Modal -->
-          <div class="modal fade" id="modal{{ order.id }}" tabindex="-1" aria-labelledby="modalLabel{{ order.id }}" aria-hidden="true">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <!-- Cabecera del modal -->
-                <div class="modal-header">
-                  <h5 class="modal-title text-dark" id="modalLabel{{ order.id }}">Detalles Pedido: {{ order.id }} - {{ order.table }}</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                </div>
-                <!-- Cuerpo del modal -->
-                <div class="modal-body">
-                  <table class="table">
-                    <thead>
-                      <tr>
-                        <th scope="col">Producto</th>
-                        <th scope="col">Cantidad</th>
-                        <th scope="col">Total</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {% for det in order_details %}
-                        {% if det.order_id == order.id %}
-                          <tr>
-                            <td>{{ det.product.name }}</td>
-                            <td>{{ det.quantity }}</td>
-                            <td>${{ det.total }}</td>
-                          </tr>
-                        {% endif %}
-                      {% endfor %}
-                      <tr>
-                        <td>
-                          <strong>Total a Pagar:</strong>
-                        </td> <!-- Mover el Total a Pagar aquí -->
-                        <td></td> <!-- Celda vacía para la columna de Cantidad -->
-                        <td>
-                          <strong>${{ order.total }}</strong>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-
-                <!-- Pie de página del modal -->
-                <div class="modal-footer">
-                  <a href={% url 'payment:money_payment' order.id %}><button type="button" class="btn bg-dark text-white" data-bs-dismiss="modal">Efectivo <i class="fas fa-money-bill-wave"></i></button></a>
-                  <a href={% url 'payment:create_order_payment' order.id %}><button type="button" class="btn bg-dark text-white" data-bs-dismiss="modal">Tarjeta <i class="fas fa-credit-card"></i></button></a>
-                </div>
-              </div>
+    <div class="container mt-5">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header">Detalles del Pago para la Orden: {{ order.id }}</div>
+            <div class="card-body">
+              <h5 class="card-title">Mesa: {{ order.table }}</h5>
+              <p class="card-text">Total de la Orden: ${{ order.total }}</p>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">Producto</th>
+                    <th scope="col">Cantidad</th>
+                    <th scope="col">Precio</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for detail in order_details %}
+                    <tr>
+                      <td>{{ detail.product.name }}</td>
+                      <td>{{ detail.quantity }}</td>
+                      <td>${{ detail.product.sale_price }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
             </div>
           </div>
-
-          <div class="order">
-            <h5 style="font-weight: bold;">Orden: {{ order.table }}</h5>
-            <div class="order-details">
-              <div class="order-item">
-                <div class="product-name">Total a Pagar: ${{ order.total }}</div>
-                <a href="#" data-bs-toggle="modal" data-bs-target="#modal{{ order.id }}" class="text-dark text-decoration-none"><button class="checkmark-button"><i class="fas fa-hourglass-start"></i></button></a>
-              </div>
-            </div>
+        </div>
+        <div class="col-md-6">
+          <div id="client-selection" class="mb-3">
+            <a href={% url 'main:create_client' %}><button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modal">Cliente <i class="fas fa-plus"></i></button></a>
+            <table id="clientTable" class="table">
+              <thead>
+                <tr>
+                  <th>Cédula</th>
+                  <th>Cliente</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for client in clients %}
+                  <tr>
+                    <td>{{ client.dni }}</td>
+                    <td>{{ client.name }} {{ client.surname }}</td>
+                    <td>
+                      <button type="button" class="btn btn-dark btn-select-client" data-client-id="{{ client.id }}"><i class="fas fa-check"></i></button>
+                      <a href="{% url 'main:update_client' client.pk %}">
+                        <button type="button" class="btn btn-info"><i class="fas fa-check"></i></button>
+                      </a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
           </div>
-        {% endfor %}
+        </div>
       </div>
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="client" id="selectedClientId" />
+        <div class="row">
+          <div class="col-12 text-center">
+            <button type="submit" class="btn btn-dark mt-4">Pagar</button>
+          </div>
+        </div>
+      </form>
     </div>
+    <script>
+      $(document).ready(function () {
+        var table = $('#clientTable').DataTable({
+          searching: true
+        })
+      
+        var payButton = $('button[type="submit"]')
+        payButton.prop('disabled', true)
+      
+        $('#clientTable').on('click', '.btn-select-client', function () {
+          var clientId = $(this).data('client-id')
+          var clientDNI = $(this).closest('tr').find('td:first').text()
+      
+          if (clientDNI !== 'None') {
+            payButton.prop('disabled', false)
+            $('#selectedClientId').val(clientId)
+          } else {
+            payButton.prop('disabled', true)
+          }
+        })
+      })
+    </script>
   </body>
 </html>
