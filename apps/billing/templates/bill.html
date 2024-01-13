@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Invoice</title>
+    <style>
+      @page {
+        size: A4;
+        margin-top: 5mm;
+        margin-left: 20mm;
+        margin-right: 20mm;
+      }
+      body {
+        font-family: 'Helvetica', 'Arial', sans-serif;
+        margin: 0;
+        padding: 0;
+        color: #333;
+        box-sizing: border-box;
+      }
+      .container {
+        max-width: 210mm; /* A4 size */
+        margin: 0 auto;
+        padding: 20mm;
+        box-sizing: border-box;
+        display: flex; /* Habilita Flexbox */
+        flex-wrap: wrap; /* Permite que los elementos se envuelvan */
+        justify-content: space-between; /* Distribuye el espacio entre los elementos */
+      }
+      .header {
+        text-align: center;
+        margin-bottom: 20px;
+        width: 100%; /* Asegura que el encabezado ocupe toda la anchura */
+      }
+      .header .invoice-number {
+        text-align: right;
+        margin-bottom: 0;
+      }
+      .header h3 {
+        font-size: 20px;
+        margin: 0;
+      }
+      .header p {
+        margin: 0;
+      }
+      .bill-to,
+      .bill-from {
+        padding: 2px;
+        flex: 1; /* Los contenedores flexibles se expandirán y se contraerán */
+        margin-right: 1px; 
+        margin-bottom: 30px;
+      }
+      .bill-to {
+        margin-right: 1px; /* Añade espacio extra al final del primer contenedor */
+      }
+      .bill-to:last-child,
+      .bill-from:last-child {
+        margin-right: 0; /* Elimina el margen derecho del último contenedor */
+      }
+      .bill-to h3,
+      .bill-from h3 {
+        font-size: 15px;
+        margin: 0 0 0px 0;
+      }
+      .bill-to p,
+      .bill-from p {
+        margin: 2px 0;
+      }
+      .table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .table th,
+      .table td {
+        padding: 8px;
+        text-align: left;
+      }
+      .table th {
+        background-color: #fff;
+        border-bottom: 2px solid #000;
+      }
+      .total {
+        width: 100%;
+        margin-top: 15px;
+        text-align: right;
+        border: 100%;
+        border-top: 2px solid #000;
+      }
+      .total h4 {
+        font-size: 18px;
+        display: inline-block;
+        margin: 0;
+        padding: 8px;
+      }
+      .terms {
+        font-size: 0.8em;
+        padding-top: 10px;
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <div class="logo">
+          <img src="data:image/png;base64,..." alt="Yummy Restaurant Logo" height="60" />
+        </div>
+        <div class="invoice-number">
+          <h3>Factura N°: 00{{ bill.pk }}</h3>
+          <p>Fecha: {{ payment.payment_date }}</p>
+        </div>
+      </div>
+      <div class="bill-to">
+        <h4>Factura Para</h4>
+        <p>
+          {{ client.dni }}<br />{{ client.name }} {{ client.surname }} <br />{{ client.address }}<br />{{ client.phone_number }}
+        </p>
+      </div>
+      <div class="bill-from">
+        <h4>Emitida Por</h4>
+        <p>
+          {{ entity.commercial_name }} <br />{{ entity.ruc }}, {{ entity.stablishment_address }}<br />{{ entity.phone_number }}
+        </p>
+      </div>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Precio</th>
+            <th>#</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in order_details %}
+            <tr>
+              <td>{{ p.product.name }}</td>
+              <td>${{ p.product.sale_price }}</td>
+              <td>{{ p.quantity }}</td>
+              <td>${{ p.total }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+        <div class="end-tb"></div>
+      </table>
+      <div class="total">
+        <h4>Total: ${{ order.total }}</h4>
+      </div>
+      <div class="terms">
+        <p>Terms and Conditions</p>
+        <p>The star charts represent the position of the stars as we see them from Earth; however, the stars in each constellation may not be close to each other, as some we perceive to be brighter because they are close to the Earth, while others are brighter because they are huge stars.</p>
+      </div>
+      {% comment %} <div class="social-icons">
+        <img src="data:image/png;base64,..." alt="Facebook Icon" />
+        <img src="data:image/png;base64,..." alt="Instagram Icon" />
+        <img src="data:image/png;base64,..." alt="Twitter Icon" />
+      </div> {% endcomment %}
+    </div>
+  </body>
+</html>
