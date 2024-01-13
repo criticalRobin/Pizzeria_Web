@@ -31,13 +31,14 @@ def delete_orderdetail_if_quantity_zero(sender, instance, **kwargs):
 
 @receiver(pre_save, sender=Order)
 def update_order_status_on_delete(sender, instance, **kwargs):
-    order = instance
-    if order.order_status != 'C':
-        total_details = order.orderdetails_set.count()
-        delivered_details = order.orderdetails_set.filter(detail_status="E").count()
-        ready_details = order.orderdetails_set.filter(detail_status="L").count()
-        print(total_details, delivered_details, ready_details)
-        if total_details == delivered_details + ready_details:  # Resta 1 a total_details
-            order.order_status = "E"
-            print(order.order_status, order.id)
+    if instance.pk is not None:
+        order = instance
+        if order.order_status != 'C':
+            total_details = order.orderdetails_set.count()
+            delivered_details = order.orderdetails_set.filter(detail_status="E").count()
+            ready_details = order.orderdetails_set.filter(detail_status="L").count()
+            print(total_details, delivered_details, ready_details)
+            if total_details == delivered_details + ready_details:  # Resta 1 a total_details
+                order.order_status = "E"
+                print(order.order_status, order.id)
   
