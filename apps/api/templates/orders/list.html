@@ -30,16 +30,18 @@
       <div id="ordenes">
         {% for order in orders %}
         {% if order.order_status == "P" %}
-        <div class="order">
+        <div class="order" id="order-{{ order.id }}">
           <h3>Orden: {{ order.table }}</h3>
           <div class="order-details">
             {% for detail in order.orderdetails_set.all %}
               {% if detail.detail_status == 'P' %}
+                {% if detail.quantity != 0 %}
                 <div class="order-item">
                   <div class="product-name">{{ detail.product.name }}</div>
                   <div class="product-quantity">Cantidad: {{ detail.quantity }}</div>
                   <a href="{% url 'api:orders_update' detail.pk %}"><button class="checkmark-button"><i class="fas fa-check"></i></button></a>
                 </div>
+                {% endif %}
               {% endif %}
             {% endfor %}
           </div>
@@ -50,12 +52,13 @@
     </div>
     <script type="text/javascript">
       const ws = new WebSocket('ws://' + window.location.host + '/ws/orders/')
-      
+      const ws2 = new WebSocket('ws://' + window.location.host + '/ws/orders/update/')
       ws.onmessage = function (e) {
         const data = JSON.parse(e.data)
         if (data.text && data.table && data.details) {
           const ordersDiv = document.getElementById('ordenes')
           const orderDiv = document.createElement('div')
+          orderDiv.id = `order-${data.id}`  // Agrega un ID al div de la orden
           orderDiv.className = 'order'
       
           let orderDetailsHtml = data.details
@@ -88,6 +91,68 @@
       }
       
       ws.onerror = function (error) {
+        console.error('WebSocket error', error)
+      }
+
+      ws2.onmessage = function (e) {
+        console.log('WebSocket message received');
+        const data = JSON.parse(e.data)
+        console.log(data.id);
+        if (data.text && data.table && data.details) {
+          const orderDetailsDiv = document.querySelector(`#order-${data.id} .order-details`)  // Obtiene el div de los detalles de la orden existente
+          if (orderDetailsDiv) {
+              let orderDetailsHtml = data.details
+              .filter(detail => detail.detail_status === 'P' && detail.quantity !== 0)
+              .map(
+                  (detail) => `
+                                  <div class="order-item">
+                                      <div class="product-name">${detail.product_name}</div>
+                                      <div class="product-quantity">Cantidad: ${detail.quantity}</div>
+                                      <a href="/api/orders/update/${detail.id}"><button class="checkmark-button"><i class="fas fa-check"></i></button></a>
+                                  </div>
+                              `
+              )
+              .join('')
+      
+              orderDetailsDiv.innerHTML = orderDetailsHtml;  // Actualiza sólo los detalles de la orden
+          }else{
+            const ordersDiv = document.getElementById('ordenes')
+          const orderDiv = document.createElement('div')
+          orderDiv.id = `order-${data.id}`  // Agrega un ID al div de la orden
+          orderDiv.className = 'order'
+      
+          let orderDetailsHtml = data.details
+          .filter(detail => detail.detail_status === 'P' && detail.quantity !== 0)
+            .map(
+              (detail) => `
+                              <div class="order-item">
+                                <div class="product-name">${detail.product_name}</div>
+                                <div class="product-quantity">Cantidad: ${detail.quantity}</div>
+                                <a href="/api/orders/update/${detail.id}"><button class="checkmark-button"><i class="fas fa-check"></i></button></a>
+                              </div>
+                            `
+            )
+            .join('')
+      
+          orderDiv.innerHTML = `
+                              <h3>Orden: ${data.table}</h3>
+                              <div class="order-details">${orderDetailsHtml}</div>
+                            `
+      
+          ordersDiv.appendChild(orderDiv)
+          }
+        }
+      }
+      
+      ws2.onopen = function () {
+        console.log('WebSocket connection established')
+      }
+      
+      ws2.onclose = function (event) {
+        console.error('WebSocket connection closed', event)
+      }
+      
+      ws2.onerror = function (error) {
         console.error('WebSocket error', error)
       }
     </script>
