@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from .models import Order, OrderDetails
 from .serializers import OrderSerializer, OrderDetailsSerializer
-from rest_framework.generics import ListCreateAPIView
+from rest_framework.generics import ListCreateAPIView, UpdateAPIView
 from django.views.generic import ListView, UpdateView
 from .forms import UpdateOrderDetailsForm
 from channels.layers import get_channel_layer
@@ -51,6 +51,32 @@ class OrderListCreateView(ListCreateAPIView):
             "orders", {"type": "order.update", "message": order_data}
         )
 
+class OrderListUpdateView(UpdateAPIView):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+    http_method_names = ['put', 'patch', 'head', 'options']  # Asegúrate de que 'put' o 'patch' estén en esta list
+    def perform_update(self, serializer):
+        order = serializer.save()
+
+        channel_layer = get_channel_layer()
+
+    # Serializar la información de la orden, incluyendo los detalles
+        order_details = OrderDetailsSerializer(
+            order.orderdetails_set.all(), many=True
+        ).data
+
+        order_data = {
+            "id": order.id,
+            "text": "Orden actualizada",
+            "table": order.table.number
+            if hasattr(order.table, "number")
+            else str(order.table),
+            "details": order_details,  # Esto incluirá los detalles de la orden
+        }
+
+        async_to_sync(channel_layer.group_send)(
+            "order_updates", {"type": "order.update", "message": order_data}
+        )
 
 class OrderDetailUpdateView(UpdateView):
     model = OrderDetails
