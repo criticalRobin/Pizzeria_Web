@@ -4,7 +4,8 @@ from django.urls import reverse, reverse_lazy
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView, CreateView
 from apps.api.models import Order, OrderDetails
-from apps.main.models import Client
+from apps.main.models import Client, Entity
+from apps.billing.models import Bill
 from .models import Payment
 from .forms import CreatePaymentForm
 from django.utils import timezone
@@ -44,9 +45,9 @@ class PaymentCreateView(LoginRequiredMixin, CreateView):
             context["order_details"] = orders_to_pay_details
             context["clients"] = clients
         return context
-    
+
     def get(self, request, *args, **kwargs):
-        self.request.session['current_order_id'] = kwargs['pk']
+        self.request.session["current_order_id"] = kwargs["pk"]
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
@@ -56,13 +57,9 @@ class PaymentCreateView(LoginRequiredMixin, CreateView):
 
         if form.is_valid():
             payment = form.save(commit=False)
-            client_id = request.POST.get(
-                "client_id"
-            ) 
+            client_id = request.POST.get("client_id")
             if client_id:
-                payment.client = Client.objects.get(
-                    id=client_id
-                ) 
+                payment.client = Client.objects.get(id=client_id)
             payment.order = order
             payment.payment_method = "E"
             payment.amount = order.total
@@ -78,6 +75,8 @@ class PaymentCreateView(LoginRequiredMixin, CreateView):
                 table.save()
 
             payment.save()
+
+            Bill.objects.create(entity=Entity.objects.get(id=1), payment=payment)
             return HttpResponseRedirect(self.success_url)
 
         context = self.get_context_data(**kwargs)
@@ -137,6 +136,8 @@ def payment_success(request, order_id):
     table = order.table
     session_id = request.GET.get("session_id")
     stripe.api_key = settings.STRIPE_API_KEY_HIDDEN
+
+    Bill.objects.create(entity=Entity.objects.get(id=1), payment=payment)
 
     if session_id:
         session = stripe.checkout.Session.retrieve(session_id)

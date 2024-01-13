@@ -3,7 +3,38 @@ from django.db import models
 from django.core.validators import MinLengthValidator, RegexValidator, EmailValidator
 from decimal import Decimal
 
+
 # Create your models here.
+class Entity(models.Model):
+    ruc = models.CharField(max_length=13, verbose_name="RUC", unique=True)
+    commercial_name = models.CharField(max_length=50, verbose_name="Nombre Comercial")
+    stablishement_address = models.CharField(
+        max_length=50, verbose_name="Dirección Establecimiento"
+    )
+    phone_regex = r"^[0-9]+$"
+    phone_validator = RegexValidator(
+        regex=phone_regex,
+        message="El número de teléfono debe contener solo números.",
+        code="invalid_phone",
+    )
+    phone_number = models.CharField(
+        max_length=10,
+        unique=True,
+        validators=[MinLengthValidator(10), phone_validator],
+        null=True,
+        blank=True,
+        verbose_name="Teléfono",
+    )
+
+    def __str__(self):
+        return f"{self.commercial_name} - {self.ruc}"
+
+    class Meta:
+        verbose_name = "Entidad"
+        verbose_name_plural = "Entidades"
+        ordering = ["id"]
+
+
 dni_regex = r"^\d{10}$"
 
 

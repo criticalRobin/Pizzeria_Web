@@ -86,6 +86,7 @@ INSTALLED_APPS = [
     "fcm_django",
     "apps.authentication",
     "apps.payment",
+    "apps.billing",
 ]
 
 REST_FRAMEWORK = {

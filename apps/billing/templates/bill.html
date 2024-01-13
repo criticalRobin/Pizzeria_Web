@@ -1,0 +1,209 @@
+{% load static %}
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Invoice</title>
+    <meta name="description" content="Invoice demo sample" />
+    <style>
+      @font-face {
+        font-family: Pacifico;
+        src: url({% static 'fonts/pacifico.ttf' %});
+      }
+      @font-face {
+        font-family: Source Sans Pro;
+        font-weight: 400;
+        src: url({% static 'fonts/sourcesanspro-regular.otf' %});
+      }
+      @font-face {
+        font-family: Source Sans Pro;
+        font-weight: 700;
+        src: url({% static 'fonts/sourcesanspro-bold.otf' %});
+      }
+      
+      @page {
+        font-family: Pacifico;
+        margin: 3cm;
+        @bottom-left {
+          color: #1ee494;
+          content: '♥ Gracias por visitarnos!';
+        }
+        @bottom-right {
+          color: #a9a;
+          content: 'la_cigarra@gmail.com | lacigarra.com';
+          font-size: 9pt;
+        }
+      }
+      
+      html {
+        color: #14213d;
+        font-family: Source Sans Pro;
+        font-size: 11pt;
+        line-height: 1.6;
+      }
+      body {
+        margin: 0;
+      }
+      
+      h1 {
+        color: #1ee494;
+        font-family: Pacifico;
+        font-size: 40pt;
+        margin: 0;
+      }
+      
+      aside {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 0em 0 3em;
+      }
+      
+      aside address {
+        font-style: normal;
+        white-space: pre-line;
+        margin: 0;
+      }
+      aside address#from {
+        color: #a9a;
+        flex: 1;
+        text-align: left;
+      }
+      aside address#to {
+        text-align: right; /* Alinea el texto a la derecha */
+        flex: 1;
+      }
+      
+      dl {
+        position: absolute;
+        right: 0;
+        text-align: right;
+        top: 0;
+      }
+      dt,
+      dd {
+        display: inline;
+        margin: 0;
+      }
+      dt {
+        color: #a9a;
+      }
+      dt::before {
+        content: '';
+        display: block;
+      }
+      dt::after {
+        content: ':';
+      }
+      
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+      th {
+        border-bottom: 0.2mm solid #a9a;
+        color: #a9a;
+        font-size: 10pt;
+        font-weight: 400;
+        padding-bottom: 0.25cm;
+        text-transform: uppercase;
+      }
+      td {
+        padding-top: 7mm;
+      }
+      td:last-of-type {
+        color: #1ee494;
+        font-weight: bold;
+        text-align: right;
+      }
+      th,
+      td {
+        text-align: center;
+      }
+      th:first-of-type,
+      td:first-of-type {
+        text-align: left;
+      }
+      th:last-of-type,
+      td:last-of-type {
+        text-align: right;
+      }
+      footer {
+        content: '';
+        display: block;
+        height: 6cm;
+      }
+      table#total {
+        background: #f6f6f6;
+        border-color: #f6f6f6;
+        border-style: solid;
+        border-width: 2cm 3cm;
+        bottom: 0;
+        font-size: 13pt;
+        margin: 0 -3cm;
+        position: absolute;
+        width: 18cm;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Factura</h1>
+
+    <aside>
+      <address id="from">
+        {{ entity.commercial_name }} <br /> {{ entity.ruc }} <br /> {{ entity.phone_number }}
+      </address>
+
+      <address id="to">Av. Los Guaytambos y Frutillas, Ambato 180108</address>
+    </aside>
+
+    <dl id="informations">
+      <dt>Factura número</dt>
+      <dd>000{{ bill.id }}</dd>
+      <dt>Fecha</dt>
+      <dd>{{ payment.payment_date|date:'d-m-Y' }}</dd>
+    </dl>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Precio</th>
+          <th>Cantidad</th>
+          <th>Subtotal</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in order_details %}
+          <tr>
+            <td>{{ p.product.name }}</td>
+            <td>${{ p.product.sale_price }}</td>
+            <td>{{ p.quantity }}</td>
+            <td>${{ p.total }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <footer>
+      <table id="total">
+        <thead>
+          <tr>
+            <th>Consumidor</th>
+            <th>Tipo de Pago</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              {{ client.dni }} <br /> {{ client.name }} {{ client.surname }} <br /> {{ client.address }} <br /> {{ client.phone_number }} <br /> {{ client.email }}
+            </td>
+            <td style="text-align: center; vertical-align: top;">{{ payment.get_payment_method_display }}</td>
+            <td style="text-align: right; vertical-align: top;">${{ payment.amount }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </footer>
+  </body>
+</html>

@@ -40,4 +40,5 @@ urlpatterns = [
     path("api/", include("apps.api.urls")),  # new
     path('route/', include(router.urls)),
     path("payment/", include("apps.payment.urls")),  # new
+    path("billing/", include("apps.billing.urls")),  # new
 ]
