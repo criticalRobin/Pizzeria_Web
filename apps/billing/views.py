@@ -1,12 +1,23 @@
+from typing import Any
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from apps.billing.models import Bill
 from django.template.loader import render_to_string
 from weasyprint import HTML
 from apps.api.models import OrderDetails
+from django.views.generic import ListView
 
 
 # Create your views here.
+class BillListView(ListView):
+    model = Bill
+    template_name = "bill_list.html"
+    context_object_name = "bills"
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        return super().get_context_data(**kwargs)
+
+
 def bill_pdf(request, pk):
     bill = get_object_or_404(Bill, pk=pk)
     entity = bill.entity

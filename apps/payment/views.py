@@ -75,6 +75,8 @@ class PaymentCreateView(LoginRequiredMixin, CreateView):
                 table.save()
 
             payment.save()
+
+            Bill.objects.create(entity=Entity.objects.get(id=1), payment=payment)
             return HttpResponseRedirect(self.success_url)
 
         context = self.get_context_data(**kwargs)
