@@ -29,6 +29,8 @@
                           Pagos
                         {% elif app.app_label == 'user' %}
                           Empleados
+                          {% elif app.app_label == 'billing' %}
+                          Facturas
                         {% else %}
                           {{ app.label|slice:10 }}{% if app.label|length > 10 %}..{% endif %}
                         {% endif %}

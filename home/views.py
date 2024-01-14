@@ -6,8 +6,7 @@ from apps.api.models import Order, OrderDetails
 from apps.main.models import Client
 from apps.payment.models import Payment
 from django.db.models import Count, Sum, F
-import json
-
+from django.db.models.functions import ExtractHour
 
 # Create your views here.
 def dashboard_stats_view(request):
@@ -137,16 +136,14 @@ def clients_stats_view(request):
     gender_names = [gender_labels[gen] for gen in gender]
 
     gender_income = (
-    Payment.objects.filter(client__isnull=False)
-    .values("client__gender")
-    .annotate(total_income=Sum("amount"))
-    .order_by("client__gender")
-)
+        Payment.objects.filter(client__isnull=False)
+        .values("client__gender")
+        .annotate(total_income=Sum("amount"))
+        .order_by("client__gender")
+    )
 
     genders = [g["client__gender"] for g in gender_income]
-    incomes = [
-        float(g["total_income"]) or 0 for g in gender_income
-    ]
+    incomes = [float(g["total_income"]) or 0 for g in gender_income]
 
     gender_mapping = {"M": "Masculino", "F": "Femenino", "O": "Otro"}
     genders = [gender_mapping.get(g, g) for g in genders]
@@ -156,10 +153,33 @@ def clients_stats_view(request):
     context["counts"] = counts
     context["generos"] = genders
     context["ingresos"] = incomes
-    print(context["generos"])
-    print(context["ingresos"])
 
     return render(request, "admin/clients-stats.html", context)
+
+
+def orders_stats_view(request):
+    orders_by_hour = Order.objects.annotate(
+        hour=ExtractHour('date')
+    ).values('hour').annotate(
+        count=Count('id')
+    ).order_by('hour')
+    hours = [order['hour'] for order in orders_by_hour]
+    counts = [order['count'] for order in orders_by_hour]
+
+    orders_by_table = Order.objects.values('table__id').annotate(
+        count=Count('id')
+    ).order_by('table__id')
+
+    table_numbers = [order['table__id'] for order in orders_by_table]
+    counts_t = [order['count'] for order in orders_by_table]
+
+    context = dashboard_stats_view(request)
+    context["hours"] = hours
+    context["counts"] = counts
+    context["table_numbers"] = table_numbers
+    context["counts_t"] = counts_t
+
+    return render(request, "admin/orders-stats.html", context)
 
 
 def index_view(request):
