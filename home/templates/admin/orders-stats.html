@@ -1,0 +1,135 @@
+{% extends 'admin/stats-base.html' %}
+{% load static %}
+{% block d_content %}
+  <div class="col-lg-6 mb-lg-0 mb-4">
+    <div class="card z-index-2 h-100">
+      <div class="card-header pb-0 pt-3 bg-transparent">
+        <h6 class="text-capitalize">Frecuencia de Pedidos por Mesa</h6>
+        <p class="text-sm mb-0">
+          <i class="fa fa-shopping-cart text-success"></i>
+          <span class="font-weight-bold">Ordenes</span> Pizzeria la Cigarra
+        </p>
+      </div>
+      <div class="card-body p-3">
+        <div class="chart">
+          <canvas id="chart-bar-tables" class="chart-canvas" height="300"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card z-index-2 h-100">
+      <div class="card-header pb-0 pt-3 bg-transparent">
+        <h6 class="text-capitalize">Distribución Horaria de Pedidos</h6>
+        <p class="text-sm mb-0">
+          <i class="fa fa-shopping-cart text-success"></i>
+          <span class="font-weight-bold">Ordenes</span> Pizzeria la Cigarra
+        </p>
+      </div>
+      <div class="card-body p-3">
+        <div class="chart">
+          <canvas id="chart-bar" class="chart-canvas" height="300"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var ctxBar = document.getElementById('chart-bar-tables').getContext('2d');
+        
+        var tables = {{ table_numbers|safe }};
+        var counts = {{ counts_t|safe }};
+        var primaryColors = [
+            'rgba(255, 99, 132, 0.8)',
+            'rgba(54, 162, 235, 0.8)',
+            'rgba(255, 206, 86, 0.8)',
+            'rgba(75, 192, 192, 0.8)',  // Pastel Blue  // Azul
+        ];
+
+        var backgroundColors = counts.map(function(_, index) {
+            return primaryColors[index % primaryColors.length];
+        });
+    
+        var barChart = new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: tables,
+                datasets: [{
+                    label: '# Ordenes Por Mesa',
+                    data: counts,
+                    backgroundColor: backgroundColors, // Aplica los colores primarios aquí
+                    borderColor: 'rgba(0, 0, 0, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            autoSkip: false
+                        }
+                    }
+                }
+            }
+        });
+    }); 
+    </script>
+</script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var ctxBar = document.getElementById('chart-bar').getContext('2d');
+        
+        var hours = {{ hours|safe }};
+        var counts = {{ counts|safe }};
+        var primaryColors = [
+            'rgba(255, 99, 132, 0.8)',
+            'rgba(54, 162, 235, 0.8)',
+            'rgba(255, 206, 86, 0.8)',
+            'rgba(75, 192, 192, 0.8)',  // Pastel Blue  // Azul
+        ];
+
+        var backgroundColors = counts.map(function(_, index) {
+            return primaryColors[index % primaryColors.length];
+        });
+    
+        var barChart = new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: hours,
+                datasets: [{
+                    label: '# Ordenes',
+                    data: counts,
+                    backgroundColor: backgroundColors, // Aplica los colores primarios aquí
+                    borderColor: 'rgba(0, 0, 0, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            autoSkip: false
+                        }
+                    }
+                }
+            }
+        });
+    }); 
+    </script>
+{% endblock %}
