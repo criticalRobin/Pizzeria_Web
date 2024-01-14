@@ -1,8 +1,16 @@
-# from django.urls import path
-# from .views import index_view
+from django.urls import path
+from .views import (
+    payments_stats_view,
+    employees_stats_view,
+    clients_stats_view,
+    orders_stats_view,
+)
 
-# app_name = "home"
+app_name = "home"
 
-# urlpatterns = [
-#     path("", index_view, name="index"),
-# ]
+urlpatterns = [
+    path("payments/", payments_stats_view, name="payments"),
+    path("employees/", employees_stats_view, name="employees"),
+    path("clients/", clients_stats_view, name="clients"),
+    path("orders/", orders_stats_view, name="orders"),
+]
