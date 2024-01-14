@@ -85,7 +85,7 @@
         labels: months_payments,
         datasets: [
           {
-            label: 'Ingresos Mensuales',
+            label: 'Ingresos por Mes $',
             tension: 0.4,
             borderWidth: 0,
             pointRadius: 0,
@@ -162,12 +162,10 @@
         var days = {{ daily_revenue_data.days|safe }};
         var dailyTotals = {{ daily_revenue_data.totals|safe }};
         var primaryColors = [
-            'rgba(255, 99, 132, 0.8)', // Rosa fuerte
-            'rgba(54, 162, 235, 0.8)', // Azul fuerte
-            'rgba(255, 206, 86, 0.8)', // Amarillo fuerte
-            'rgba(75, 192, 192, 0.8)', // Verde agua fuerte
-            'rgba(153, 102, 255, 0.8)', // Morado fuerte
-            'rgba(255, 159, 64, 0.8)'  // Pastel Blue  // Azul
+            'rgba(255, 99, 132, 0.8)',
+            'rgba(54, 162, 235, 0.8)',
+            'rgba(255, 206, 86, 0.8)',
+            'rgba(75, 192, 192, 0.8)',  // Pastel Blue  // Azul
         ];
 
         var backgroundColors = dailyTotals.map(function(_, index) {
@@ -179,7 +177,7 @@
             data: {
                 labels: days,
                 datasets: [{
-                    label: 'Ingresos Diarios',
+                    label: 'Ingresos Por Día $',
                     data: dailyTotals,
                     backgroundColor: backgroundColors, // Aplica los colores primarios aquí
                     borderColor: 'rgba(0, 0, 0, 1)',
@@ -218,12 +216,13 @@
             data: {
                 labels: paymentMethods,
                 datasets: [{
-                    label: 'Ingresos por Método de Pago',
+                    label: 'Ingresos por Método de Pago $',
                     data: amounts,
                     backgroundColor: [
-                        '#FF6384', // Rojo para el primer método de pago
-                        '#36A2EB', // Azul para el segundo método de pago
-                        // Agrega más colores si hay más métodos de pago
+                    'rgba(255, 99, 132, 0.8)',
+                    'rgba(54, 162, 235, 0.8)',
+                    'rgba(255, 206, 86, 0.8)',
+                    'rgba(75, 192, 192, 0.8)',  // Pastel Blue  // Azul
                     ],
                     hoverOffset: 4
                 }]
@@ -247,12 +246,10 @@
         var products = {{ product_names|safe }};
         var revenues = {{ revenues|safe }};
         var primaryColors = [
-            'rgba(255, 99, 132, 0.8)', // Rosa fuerte
-            'rgba(54, 162, 235, 0.8)', // Azul fuerte
-            'rgba(255, 206, 86, 0.8)', // Amarillo fuerte
-            'rgba(75, 192, 192, 0.8)', // Verde agua fuerte
-            'rgba(153, 102, 255, 0.8)', // Morado fuerte
-            'rgba(255, 159, 64, 0.8)'  // Pastel Blue  // Azul
+            'rgba(255, 99, 132, 0.8)',
+            'rgba(54, 162, 235, 0.8)',
+            'rgba(255, 206, 86, 0.8)',
+            'rgba(75, 192, 192, 0.8)',  // Pastel Blue  // Azul
         ];
 
         var backgroundColors = revenues.map(function(_, index) {
@@ -264,7 +261,7 @@
             data: {
                 labels: products,
                 datasets: [{
-                    label: 'Ingresos Por Producto',
+                    label: 'Ingresos Por Producto $',
                     data: revenues,
                     backgroundColor: backgroundColors, // Aplica los colores primarios aquí
                     borderColor: 'rgba(0, 0, 0, 1)',

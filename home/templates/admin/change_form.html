@@ -1,6 +1,10 @@
 {% extends "layouts/base.html" %}
 {% load i18n admin_urls static admin_modify %}
 
+{% block sidebar %}
+  {% include 'includes/sidebar.html' %}
+{% endblock %}
+
 {% block overlay %}
   <div class="min-height-300 bg-dark position-absolute w-100"></div>
 {% endblock overlay %}

@@ -21,6 +21,17 @@ def dashboard_stats_view(request):
     months = [order["month"].strftime("%b") for order in orders_by_month]
     totals = [order["total"] for order in orders_by_month]
 
+    daily_revenue = (
+        Payment.objects.annotate(day=TruncDay("payment_date"))
+        .values("day")
+        .annotate(total=Sum("amount"))
+        .order_by("day")
+    )
+    daily_revenue_data = {
+        "days": [revenue["day"].strftime("%Y-%m-%d") for revenue in daily_revenue],
+        "totals": [float(revenue["total"]) for revenue in daily_revenue],
+    }
+
     total_orders = Order.objects.count()
     users_count = User.objects.count()
     clients_count = Client.objects.count()
@@ -35,6 +46,7 @@ def dashboard_stats_view(request):
             "months": months,
             "totals": totals,
         },
+        "daily_revenue_data": daily_revenue_data,
     }
     return context
 
@@ -96,9 +108,31 @@ def payments_stats_view(request):
     context["amounts"] = amounts
     context["product_names"] = product_names
     context["revenues"] = revenues
-    print(context["product_names"])
-    print(context["revenues"])
+
     return render(request, "admin/payment-stats.html", context)
+
+
+def employees_stats_view(request):
+    role_counts = (
+        User.objects.values("employee_role")
+        .annotate(total=Count("employee_role"))
+        .order_by("employee_role")
+    )
+    roles = [role["employee_role"] for role in role_counts]
+    counts = [role["total"] for role in role_counts]
+    role_labels = {
+        "admin": "Administrador",
+        "waiter": "Mesero",
+        "cashier": "Cajero",
+        "chef": "Cocinero",
+    }
+    role_names = [role_labels[role] for role in roles]
+
+    context = dashboard_stats_view(request)
+    context["role_names"] = role_names
+    context["counts"] = counts
+
+    return render(request, "admin/employees-stats.html", context)
 
 
 def index_view(request):
