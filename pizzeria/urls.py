@@ -19,9 +19,15 @@ from django.urls import path, include  # new
 from fcm_django.api.rest_framework import FCMDeviceAuthorizedViewSet
 
 from rest_framework.routers import DefaultRouter
+
+from django.conf import settings
+from django.conf.urls.static import static
+
 router = DefaultRouter()
 
-router.register('devices', FCMDeviceAuthorizedViewSet)
+# sso_server = SsoServer()
+
+router.register("devices", FCMDeviceAuthorizedViewSet)
 from home.admin import home_admin_site
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -38,7 +44,8 @@ urlpatterns = [
     path("admin/", home_admin_site.urls),
     path("main/", include("apps.main.urls")),  # new
     path("api/", include("apps.api.urls")),  # new
-    path('route/', include(router.urls)),
+    path("route/", include(router.urls)),
     path("payment/", include("apps.payment.urls")),  # new
     path("billing/", include("apps.billing.urls")),  # new
-]
+    path("home/", include("home.urls")),  # new
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

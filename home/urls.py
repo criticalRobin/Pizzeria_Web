@@ -1,8 +1,8 @@
-# from django.urls import path
-# from .views import index_view
+from django.urls import path
+from .views import payments_stats_view
 
-# app_name = "home"
+app_name = "home"
 
-# urlpatterns = [
-#     path("", index_view, name="index"),
-# ]
+urlpatterns = [
+    path("payments/", payments_stats_view, name="payments"),
+]
