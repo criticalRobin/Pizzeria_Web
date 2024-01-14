@@ -11,16 +11,6 @@ import json
 
 # Create your views here.
 def dashboard_stats_view(request):
-    orders_by_month = (
-        Order.objects.annotate(month=TruncMonth("date"))
-        .values("month")
-        .annotate(total=Count("id"))
-        .order_by("month")
-    )
-
-    months = [order["month"].strftime("%b") for order in orders_by_month]
-    totals = [order["total"] for order in orders_by_month]
-
     daily_revenue = (
         Payment.objects.annotate(day=TruncDay("payment_date"))
         .values("day")
@@ -42,10 +32,6 @@ def dashboard_stats_view(request):
         "users_count": users_count,
         "total_orders": total_orders,
         "total_money_payments": total_money_payments,
-        "orders_chart_data": {
-            "months": months,
-            "totals": totals,
-        },
         "daily_revenue_data": daily_revenue_data,
     }
     return context
@@ -133,6 +119,47 @@ def employees_stats_view(request):
     context["counts"] = counts
 
     return render(request, "admin/employees-stats.html", context)
+
+
+def clients_stats_view(request):
+    client_counts = (
+        Client.objects.values("gender")
+        .annotate(total=Count("gender"))
+        .order_by("gender")
+    )
+    gender = [gen["gender"] for gen in client_counts]
+    counts = [gen["total"] for gen in client_counts]
+    gender_labels = {
+        "M": "Masculino",
+        "F": "Femenino",
+        "O": "Otro",
+    }
+    gender_names = [gender_labels[gen] for gen in gender]
+
+    gender_income = (
+    Payment.objects.filter(client__isnull=False)
+    .values("client__gender")
+    .annotate(total_income=Sum("amount"))
+    .order_by("client__gender")
+)
+
+    genders = [g["client__gender"] for g in gender_income]
+    incomes = [
+        float(g["total_income"]) or 0 for g in gender_income
+    ]
+
+    gender_mapping = {"M": "Masculino", "F": "Femenino", "O": "Otro"}
+    genders = [gender_mapping.get(g, g) for g in genders]
+
+    context = dashboard_stats_view(request)
+    context["gender_names"] = gender_names
+    context["counts"] = counts
+    context["generos"] = genders
+    context["ingresos"] = incomes
+    print(context["generos"])
+    print(context["ingresos"])
+
+    return render(request, "admin/clients-stats.html", context)
 
 
 def index_view(request):
