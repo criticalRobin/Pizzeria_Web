@@ -58,8 +58,9 @@
         if (data.text && data.table && data.details) {
           const ordersDiv = document.getElementById('ordenes')
           const orderDiv = document.createElement('div')
-          orderDiv.id = `order-${data.id}`  // Agrega un ID al div de la orden
           orderDiv.className = 'order'
+          orderDiv.id = `order-${data.id}`  // Agrega un ID al div de la orden
+          
       
           let orderDetailsHtml = data.details
             .map(
