@@ -6,7 +6,7 @@ Repositorio parte Web del Proyecto de Metodologias Ágiles
 1. Crear una Carpeta de Trabajo: Inicie creando una carpeta en su computadora donde alojará el proyecto.
 2. Clonar el Repositorio: Abra la consola de comandos y navegue hasta la carpeta que ha creado. Ejecute el siguiente comando para clonar el repositorio:
 
-      git clone https://github.com/criticalRobin/trying_websockets_django.git
+      git clone https://github.com/criticalRobin/trying_websockets_django.git](https://github.com/criticalRobin/Pizzeria_Web.git
       
 3. Preparación del Entorno Virtual: Antes de continuar, asegúrese de tener instalado Python y el gestor de paquetes pip. Puede verificar su instalación con los comandos python --version y pip --version.
 4. Instalación de Virtualenv: Si no tiene virtualenv instalado, puede hacerlo mediante pip con el siguiente comando:
@@ -15,8 +15,6 @@ Repositorio parte Web del Proyecto de Metodologias Ágiles
 
 5. Creación del Entorno Virtual: Dentro de la carpeta del proyecto, cree un entorno virtual ejecutando: python3 -m venv env
 6. Activación del Entorno Virtual: Antes de proceder con la instalación de dependencias y la configuración del proyecto, active el entorno virtual.
-
-   En Windows, use: env\Scripts\activate
 
    En sistemas Unix o MacOS, use: source env/bin/activate
 
