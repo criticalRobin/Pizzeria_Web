@@ -45,7 +45,7 @@ Repositorio parte Web del Proyecto de Metodologias Ágiles
 
     redis-server
 
-    Una vez redis este corriendo, en la consola en la que se encuentra dentro del proyecto clonado con el entorno virtual activado ejecute el comando: daphne websockets.asgi:application
+    Una vez redis este corriendo, en la consola en la que se encuentra dentro del proyecto clonado con el entorno virtual activado ejecute el comando: daphne pizzeria.asgi:application
 
     Si ve el resultado de la imagen el sistema ha sido levantado de forma correcta:
 
