@@ -40,6 +40,7 @@ httplib2==0.22.0
 hyperlink==21.0.0
 idna==3.6
 incremental==22.10.0
+itsdangerous==0.24
 msgpack==1.0.7
 Pillow==10.1.0
 proto-plus==1.23.0
@@ -68,6 +69,7 @@ uritemplate==4.1.1
 urllib3==2.1.0
 weasyprint==60.1
 webencodings==0.5.1
+webservices==0.7
 whitenoise==6.6.0
 zope.interface==6.1
 zopfli==0.2.3
