@@ -40,6 +40,7 @@ class OrderListCreateView(ListCreateAPIView):
         ).data
 
         order_data = {
+            "id": order.id,
             "text": "Nueva orden creada",
             "table": order.table.number
             if hasattr(order.table, "number")
