@@ -1,4 +1,5 @@
 from typing import Any
+from django.core.mail import EmailMessage, BadHeaderError
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from apps.billing.models import Bill
@@ -40,6 +41,25 @@ def bill_pdf(request, pk):
     html = HTML(string=html_string, base_url=request.build_absolute_uri())
     result = html.write_pdf(presentational_hints=True)
 
-    response = HttpResponse(result, content_type="application/pdf;")
+    email = EmailMessage(
+        subject="Factura Pizzeria la Cigarra",
+        body="Aquí está la factura de tu reciente orden.",
+        from_email="lacigarrasw@gmail.com",
+        to=[client.email],
+    )
+
+    email.attach(f"factura_{bill.pk}.pdf", result, "application/pdf")
+
+    try:
+        email.send()
+        print("El correo electrónico se ha enviado correctamente.")
+    except BadHeaderError:
+        print("Error en los encabezados del correo electrónico.")
+        return HttpResponse("Invalid header found.")
+    except Exception as e:
+        print(f"Ocurrió un error al enviar el correo: {e}")
+        return HttpResponse("Email could not be sent")
+
+    response = HttpResponse(result, content_type="application/pdf")
     response["Content-Disposition"] = f"inline; filename=factura_{bill.pk}.pdf"
     return response

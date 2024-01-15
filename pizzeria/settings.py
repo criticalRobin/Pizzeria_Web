@@ -60,6 +60,13 @@ SECRET_KEY = "django-insecure-jjudb-&z4%axqx3v5(4#n$8hx_6cb4r7q%*6)4#@9@)e0zw7j8
 STRIPE_API_KEY_PUBLISHABLE = "pk_test_51OWWyHHYxdKboImTe0B7Z3egtHbvuGo1OYHZThgIJN0ysZlv6YRq1kGg50GLvT3p6FUfBNJ73CN40HddrG400QuV00sKOneSWp"
 STRIPE_API_KEY_HIDDEN = "sk_test_51OWWyHHYxdKboImTB6DiBOIuwIo8BUcDXmRk9jLBEBTmBEFBoYuDXKzNozRY09T8e49p3lgfAIyanlnLw9c4Q3De00rIjlF9w2"
 
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = "lacigarrasw@gmail.com"
+EMAIL_HOST_PASSWORD = "hdld zhyp doti tnaj"
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
