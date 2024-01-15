@@ -1,0 +1,239 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Facturas</title>
+    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css" />
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+      }
+      
+      .navbar {
+        background-color: #f8f8f8;
+        border-bottom: 1px solid #e7e7e7;
+        padding: 10px 20px;
+      }
+      
+      .navbar-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      
+      .navbar-welcome h3 {
+        margin: 0;
+        color: #212529;
+        font-size: 18px;
+        font-weight: bold;
+      }
+      
+      .navbar-welcome p {
+        margin: 0;
+        color: #666;
+        font-size: 14px;
+      }
+      
+      .navbar-logout {
+        display: flex;
+        align-items: center;
+      }
+      
+      .logout-link {
+        text-decoration: none;
+        color: #212529;
+        font-size: 15px;
+        margin-right: 10px;
+      }
+      
+      .orders-container {
+        background-color: #212529;
+        border-radius: 10px;
+        padding: 20px;
+        color: white;
+        width: 50%;
+        margin: auto;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+        margin-top: 25px;
+        margin-bottom: 50px;
+      }
+      
+      .orders-header {
+        display: flex;
+        flex-direction: column;
+        align-items: start;
+      }
+      
+      .orders-header h3 {
+        color: #fff;
+        font-weight: bold;
+        font-size: 14;
+      }
+      
+      .order {
+        background-color: #444;
+        border-radius: 8px;
+        padding: 10px;
+        margin-bottom: 10px;
+      }
+      
+      .order-details {
+        margin-top: 10px;
+      }
+      
+      .order-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+      
+      .product-name {
+        flex-grow: 1;
+        margin-right: 10px;
+      }
+      
+      .product-quantity {
+        flex-basis: 100px;
+        margin-right: 180px;
+      }
+      
+      .checkmark-button {
+        background-color: #4caf50;
+        border: none;
+        color: white;
+        padding: 5px 10px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        cursor: pointer;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        transition: background-color 0.3s ease;
+        margin-left: 10px;
+      }
+      
+      .checkmark-button:hover {
+        background-color: #45a049;
+      }
+      
+      /* Responsive Styles */
+      @media (max-width: 768px) {
+        .navbar-container {
+          flex-direction: column;
+        }
+      
+        .orders-container {
+          width: 80%;
+          margin-top: 10px;
+          margin-bottom: 25px;
+        }
+      
+        .order-item {
+          justify-content: space-between;
+        }
+      
+        .product-quantity {
+          flex-basis: auto;
+          margin-right: 10px;
+        }
+      
+        .checkmark-button {
+          margin-left: auto;
+        }
+      }
+      
+      @media (max-width: 576px) {
+        .orders-container {
+          width: 90%;
+          padding: 10px;
+        }
+      
+        .order-item {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+      
+        .product-name,
+        .product-quantity {
+          margin-right: 0;
+        }
+      
+        .checkmark-button {
+          padding: 10px 20px;
+          margin-top: 10px;
+          width: 100%;
+          box-sizing: border-box;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="navbar-container">
+        <div class="navbar-welcome">
+          <h3>Bienvenido de vuelta, {{ user.first_name }}</h3>
+          <p>Estos son los pedidos pendientes del día de hoy</p>
+        </div>
+        <div class="navbar-logout" style="margin-left: 900px;">
+          <a href="{% url 'payment:temp' %}" class="logout-link" style="text-decoration: none;">
+            <i class="fa fa-home me-sm-1"></i>
+            <span class="d-sm-inline d-none me-3">Inicio</span>
+          </a>
+          <a href="{% url 'auth:logout' %}" class="logout-link" style="text-decoration: none;">
+            <i class="fa fa-user me-sm-1"></i>
+            <span class="d-sm-inline d-none me-3">Salir</span>
+          </a>
+        </div>
+      </div>
+    </nav>
+    <div class="container mt-5">
+      <div class="row justify-content-center">
+        <div class="col-12">
+          <div id="client-selection" class="mb-3">
+            <table id="clientTable" class="table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Cliente</th>
+                  <th>Fecha</th>
+                  <th>Total</th>
+                  <th>Factura</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for b in bills %}
+                  <tr>
+                    <td>000{{ b.id }}</td>
+                    <td>{{ b.payment.client.name }} {{ b.payment.client.surname }}</td>
+                    <td>{{ b.payment.payment_date }}</td>
+                    <td>{{ b.payment.amount }}</td>
+                    <td>
+                      <a href="{% url 'billing:bill_pdf' b.pk %}" target="_blank"><button type="button" class="btn btn-danger"><i class="fas fa-file-pdf"></i></button></a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      $(document).ready(function () {
+        var table = $('#clientTable').DataTable({
+          searching: true
+        })
+      })
+    </script>
+  </body>
+</html>

@@ -1,8 +1,40 @@
 import re
 from django.db import models
 from django.core.validators import MinLengthValidator, RegexValidator, EmailValidator
+from decimal import Decimal
+
 
 # Create your models here.
+class Entity(models.Model):
+    ruc = models.CharField(max_length=13, verbose_name="RUC", unique=True)
+    commercial_name = models.CharField(max_length=50, verbose_name="Nombre Comercial")
+    stablishement_address = models.CharField(
+        max_length=50, verbose_name="Dirección Establecimiento"
+    )
+    phone_regex = r"^[0-9]+$"
+    phone_validator = RegexValidator(
+        regex=phone_regex,
+        message="El número de teléfono debe contener solo números.",
+        code="invalid_phone",
+    )
+    phone_number = models.CharField(
+        max_length=10,
+        unique=True,
+        validators=[MinLengthValidator(10), phone_validator],
+        null=True,
+        blank=True,
+        verbose_name="Teléfono",
+    )
+
+    def __str__(self):
+        return f"{self.commercial_name} - {self.ruc}"
+
+    class Meta:
+        verbose_name = "Entidad"
+        verbose_name_plural = "Entidades"
+        ordering = ["id"]
+
+
 dni_regex = r"^\d{10}$"
 
 
@@ -19,8 +51,8 @@ class Client(models.Model):
         max_length=10,
         validators=[MinLengthValidator(10), ecuadorian_dni_validator],
         unique=True,
-        null=False,
-        blank=False,
+        null=True,
+        blank=True,
         verbose_name="Cédula",
     )
     name = models.CharField(
@@ -42,8 +74,8 @@ class Client(models.Model):
         validators=[
             RegexValidator(r"^[A-Za-z0-9\s]+$", "No se permiten caracteres especiales")
         ],
-        null=False,
-        blank=False,
+        null=True,
+        blank=True,
         verbose_name="Dirección",
     )
 
@@ -57,6 +89,8 @@ class Client(models.Model):
         max_length=10,
         unique=True,
         validators=[MinLengthValidator(10), phone_validator],
+        null=True,
+        blank=True,
         verbose_name="Teléfono",
     )
     email = models.CharField(
@@ -80,6 +114,10 @@ class Client(models.Model):
     def __str__(self):
         return self.name + " " + self.surname
 
+    class Meta:
+        verbose_name = "Cliente"
+        verbose_name_plural = "Clientes"
+
 
 class Table(models.Model):
     chairs_number = models.IntegerField(default=1, verbose_name="Número de sillas")
@@ -88,10 +126,35 @@ class Table(models.Model):
     def __str__(self):
         return "Mesa " + str(self.id)
 
+    class Meta:
+        verbose_name = "Mesa"
+        verbose_name_plural = "Mesas"
+
+
+class Category(models.Model):
+    name = models.CharField(
+        max_length=20, null=False, blank=False, verbose_name="Nombre"
+    )
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Categoría"
+        verbose_name_plural = "Categorías"
+
 
 class Product(models.Model):
     name = models.CharField(
         max_length=20, null=False, blank=False, verbose_name="Nombre"
+    )
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.CASCADE,
+        verbose_name="Categoría",
+        null=True,
+        blank=True,
+        default=None,
     )
     stock = models.PositiveIntegerField(
         default=0, null=True, blank=True, verbose_name="Stock"
@@ -116,3 +179,13 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        verbose_name = "Producto"
+        verbose_name_plural = "Productos"
+
+    def save(self, *args, **kwargs):
+        self.sale_price = self.unit_price + (
+            self.unit_price * (Decimal(self.iva) * Decimal(0.01))
+        )
+        super().save(*args, **kwargs)
