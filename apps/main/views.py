@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
-from .models import Product, Table, Client
+from .models import Product, Table, Client, ecuadorian_dni_validator
 from .serializers import ProductSerializer, TableSerializer
 from rest_framework.generics import ListAPIView
 from rest_framework.decorators import api_view
@@ -9,6 +9,7 @@ from fcm_django.models import FCMDevice
 from django.views.generic import CreateView, UpdateView
 from .forms import CreateClientForm
 from django.http import HttpResponseRedirect
+from django.contrib import messages
 
 
 # Create your views here.
@@ -57,6 +58,9 @@ class ClientCreateView(CreateView):
         form = self.form_class(request.POST)
         if form.is_valid():
             client = form.save(commit=False)
+            if not ecuadorian_dni_validator(client.dni):
+                messages.error(request, 'La cedula no es válida.')
+                return render(request, self.template_name, {'form': form})
             client.save()
             return HttpResponseRedirect(self.get_success_url())
         self.object = None
