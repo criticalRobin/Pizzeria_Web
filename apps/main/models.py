@@ -1,7 +1,9 @@
 import re
+from xml.dom import ValidationErr
 from django.db import models
 from django.core.validators import MinLengthValidator, RegexValidator, EmailValidator
 from decimal import Decimal
+from django.core.exceptions import ValidationError
 
 
 # Create your models here.
@@ -39,11 +41,32 @@ dni_regex = r"^\d{10}$"
 
 
 def ecuadorian_dni_validator(dni):
-    if re.match(dni_regex, dni):
+    if len(dni) == 10:
         province = int(dni[0:2])
         if province >= 1 and province <= 24:
-            return True
-    return False
+            last_digit = int(dni[9])
+            even_sum = sum(int(dni[i]) for i in range(1, 9, 2))
+            odd_sum = 0
+            for i in range(0, 9, 2):
+                odd_digit = int(dni[i]) * 2
+                if odd_digit > 9:
+                    odd_digit -= 9
+                odd_sum += odd_digit
+            total = even_sum + odd_sum
+            first_digit = int(str(total)[0])
+            next_ten = (first_digit + 1) * 10
+            validator = next_ten - total
+            if validator == 10:
+                validator = 0
+            if validator == last_digit:
+                return 
+            else:
+                raise ValidationError(f"La cedula no existe, cambie el ultimo digito por {validator} para que su cedula sea aceptada")
+                
+        else:
+            raise ValidationError('Provincia no encontrada')
+    else:
+        raise ValidationError('Su cedula no posee 10 digitos')
 
 
 class Client(models.Model):
@@ -110,7 +133,7 @@ class Client(models.Model):
     gender = models.CharField(
         max_length=10, choices=GENDER_CHOICES, default="M", verbose_name="Género"
     )
-
+        
     def __str__(self):
         return self.name + " " + self.surname
 
